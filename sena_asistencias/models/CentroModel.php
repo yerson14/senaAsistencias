@@ -1,5 +1,5 @@
 <?php
-require_once '../config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class CentroModel {
     private $db;
@@ -18,6 +18,12 @@ class CentroModel {
     public function obtenerCentrosPorRegional($regional_id) {
         $stmt = $this->db->prepare("SELECT * FROM centros WHERE regional_id = ?");
         $stmt->execute([$regional_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Obtener todos los centros
+    public function obtenerCentros() {
+        $stmt = $this->db->query("SELECT * FROM centros");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
