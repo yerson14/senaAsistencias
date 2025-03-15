@@ -1,5 +1,5 @@
 <?php
-require_once '../config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class InstructorModel {
     private $db;
@@ -9,16 +9,22 @@ class InstructorModel {
     }
 
     // Crear un nuevo instructor
-    public function crearInstructor($usuario_id, $centro_id) {
-        $stmt = $this->db->prepare("INSERT INTO instructores (usuario_id, centro_id) VALUES (?, ?)");
-        return $stmt->execute([$usuario_id, $centro_id]);
-    }
+    public function crearInstructor($nombre, $correo, $numero_identificacion, $centro_id) {
+        try {
+            // Insertar el instructor en la tabla de usuarios
+            $stmt = $this->db->prepare("INSERT INTO usuarios (nombre, correo, numero_identificacion, rol) VALUES (?, ?, ?, 'instructor')");
+            $stmt->execute([$nombre, $correo, $numero_identificacion]);
 
-    // Obtener instructores por centro
-    public function obtenerInstructoresPorCentro($centro_id) {
-        $stmt = $this->db->prepare("SELECT * FROM instructores WHERE centro_id = ?");
-        $stmt->execute([$centro_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Obtener el ID del usuario creado
+            $usuario_id = $this->db->lastInsertId();
+
+            // Asignar el instructor a un centro
+            $stmt = $this->db->prepare("INSERT INTO instructores (usuario_id, centro_id) VALUES (?, ?)");
+            $stmt->execute([$usuario_id, $centro_id]);
+
+            return true;
+        } catch (PDOException $e) {
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
     }
 }
-?>
