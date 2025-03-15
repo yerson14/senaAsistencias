@@ -1,5 +1,8 @@
 <?php
-require_once '../config/Database.php';
+session_start(); // Iniciar la sesión
+require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . '/../models/AmbienteModel.php'; // Incluir el modelo AmbienteModel
+require_once __DIR__ . '/../models/CentroModel.php'; // Incluir el modelo CentroModel
 
 class CoordinadorController {
     private $db;
@@ -8,49 +11,59 @@ class CoordinadorController {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Crear un programa de formación
-    public function crearProgramaFormacion($nombre, $centro_id) {
-        $stmt = $this->db->prepare("INSERT INTO programas_formacion (nombre, centro_id) VALUES (?, ?)");
-        return $stmt->execute([$nombre, $centro_id]);
-    }
-
-    // Crear una ficha
-    public function crearFicha($codigo, $programa_formacion_id) {
-        $stmt = $this->db->prepare("INSERT INTO fichas (codigo, programa_formacion_id) VALUES (?, ?)");
-        return $stmt->execute([$codigo, $programa_formacion_id]);
-    }
-
     // Crear un ambiente
     public function crearAmbiente($nombre, $centro_id) {
-        $stmt = $this->db->prepare("INSERT INTO ambientes (nombre, centro_id) VALUES (?, ?)");
-        return $stmt->execute([$nombre, $centro_id]);
+        try {
+            // Validar que los campos no estén vacíos
+            if (empty($nombre) || empty($centro_id)) {
+                throw new Exception("Todos los campos son requeridos.");
+            }
+
+            // Validar que el centro_id sea un número
+            if (!is_numeric($centro_id)) {
+                throw new Exception("El ID del centro debe ser un número.");
+            }
+
+            // Usar el modelo AmbienteModel para crear el ambiente
+            $ambienteModel = new AmbienteModel();
+            if ($ambienteModel->crearAmbiente($nombre, $centro_id)) {
+                $_SESSION['success'] = "Ambiente creado exitosamente.";
+                // Redirigir usando una ruta relativa desde la raíz del proyecto
+                header("Location: /senaAsistencias/sena_asistencias/views/coordinator/index.php");
+                exit();
+            } else {
+                throw new Exception("Error al crear el ambiente.");
+            }
+        } catch (PDOException $e) {
+            // Capturar errores de base de datos
+            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+            header("Location: /senaAsistencias/sena_asistencias/views/coordinator/create_ambiente.php");
+            exit();
+        } catch (Exception $e) {
+            // Capturar otros errores
+            $_SESSION['error'] = $e->getMessage();
+            header("Location: /senaAsistencias/sena_asistencias/views/coordinator/create_ambiente.php");
+            exit();
+        }
     }
 
-    // Crear un instructor
-    public function crearInstructor($usuario_id, $centro_id) {
-        $stmt = $this->db->prepare("INSERT INTO instructores (usuario_id, centro_id) VALUES (?, ?)");
-        return $stmt->execute([$usuario_id, $centro_id]);
+    // Obtener todos los centros
+    public function obtenerCentros() {
+        $centroModel = new CentroModel();
+        return $centroModel->obtenerCentros();
     }
+}
 
-    // Obtener programas de formación por centro
-    public function obtenerProgramasPorCentro($centro_id) {
-        $stmt = $this->db->prepare("SELECT * FROM programas_formacion WHERE centro_id = ?");
-        $stmt->execute([$centro_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+// Manejar las acciones del controlador
+if (isset($_GET['action'])) {
+    $action = $_GET['action'];
+    $coordinadorController = new CoordinadorController();
 
-    // Obtener fichas por programa de formación
-    public function obtenerFichasPorPrograma($programa_formacion_id) {
-        $stmt = $this->db->prepare("SELECT * FROM fichas WHERE programa_formacion_id = ?");
-        $stmt->execute([$programa_formacion_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    // Obtener ambientes por centro
-    public function obtenerAmbientesPorCentro($centro_id) {
-        $stmt = $this->db->prepare("SELECT * FROM ambientes WHERE centro_id = ?");
-        $stmt->execute([$centro_id]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Acción para crear un ambiente
+    if ($action === 'create_ambiente' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $nombre = $_POST['nombre'];
+        $centro_id = $_POST['centro_id'];
+        $coordinadorController->crearAmbiente($nombre, $centro_id);
     }
 }
 ?>

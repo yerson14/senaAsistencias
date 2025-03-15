@@ -1,5 +1,5 @@
 <?php
-require_once '../config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class AmbienteModel {
     private $db;
@@ -10,8 +10,12 @@ class AmbienteModel {
 
     // Crear un nuevo ambiente
     public function crearAmbiente($nombre, $centro_id) {
-        $stmt = $this->db->prepare("INSERT INTO ambientes (nombre, centro_id) VALUES (?, ?)");
-        return $stmt->execute([$nombre, $centro_id]);
+        try {
+            $stmt = $this->db->prepare("INSERT INTO ambientes (nombre, centro_id) VALUES (?, ?)");
+            return $stmt->execute([$nombre, $centro_id]);
+        } catch (PDOException $e) {
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
     }
 
     // Obtener ambientes por centro
@@ -21,4 +25,3 @@ class AmbienteModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
-?>

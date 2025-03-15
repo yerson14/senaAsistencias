@@ -21,14 +21,7 @@
             <img src="../../assets/images/carrusel3.jpg" alt="Imagen 3" class="w-full h-64 object-cover rounded-lg">
         </div>
     </div>
-
-    <!-- Script para el menú hamburguesa -->
-    <script>
-        document.getElementById('menu-toggle').addEventListener('click', function() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        });
-    </script>
+  
 
     <?php include '../partials/footer.php'; ?>
 </body>

@@ -3,11 +3,6 @@
 </footer>
 
 <!-- Script para el menú hamburguesa -->
-<script>
-    document.getElementById('menu-toggle').addEventListener('click', function() {
-        const sidebar = document.getElementById('sidebar');
-        sidebar.classList.toggle('-translate-x-full');
-    });
-</script>
+
 </body>
 </html>

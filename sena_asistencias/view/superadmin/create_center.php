@@ -1,5 +1,4 @@
 <?php
-session_start();
 require_once '../../config/Database.php'; // Asegúrate de que la ruta sea correcta
 require_once '../../models/RegionalModel.php'; // Asegúrate de que la ruta sea correcta
 
@@ -9,6 +8,7 @@ $regionales = $regionalModel->obtenerRegionales();
 ?>
 
 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <?php include '../partials/header.php'; ?>
 <?php include '../partials/sidebar.php'; ?>
 

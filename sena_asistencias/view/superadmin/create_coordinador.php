@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../models/CentroModel.php'; // Incluir el modelo CentroModel
 require_once __DIR__ . '/../../models/UsuarioModel.php'; // Incluir el modelo UsuarioModel

@@ -1,8 +1,10 @@
 <?php
-session_start(); // Iniciar la sesión
+if (session_status() === PHP_SESSION_NONE) {
+    session_start(); // Iniciar la sesión solo si no está activa
+}
 ?>
 
-<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-blue-800 text-white overflow-y-auto transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out z-40">
+<aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-blue-800 text-white overflow-y-auto transform -translate-x-full transition-transform duration-200 ease-in-out z-40">
     <div class="p-4">
         <h2 class="text-2xl font-bold">SENA</h2>
     </div>
