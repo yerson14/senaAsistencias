@@ -16,9 +16,9 @@
        
         <!-- Carrusel de Imágenes -->
         <div class="carrusel">
-            <img src="../../assets/images/carrusel1.jpg" alt="Imagen 1" class="w-full h-64 object-cover rounded-lg">
-            <img src="../../assets/images/carrusel2.jpg" alt="Imagen 2" class="w-full h-64 object-cover rounded-lg">
-            <img src="../../assets/images/carrusel3.jpg" alt="Imagen 3" class="w-full h-64 object-cover rounded-lg">
+            <img src="https://th.bing.com/th?id=OIP.awn2pqFwr0sSWQFnlLjomwHaFX&w=293&h=212&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" alt="Imagen 1" class="w-full h-64 object-cover rounded-lg">
+            <img src="https://th.bing.com/th?id=OIP.wwBfUtiEYQEygQyDoWy3OwHaFj&w=288&h=216&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2" alt="Imagen 2" class="w-full h-64 object-cover rounded-lg">
+            <img src="https://th.bing.com/th/id/OIP.3YXocLVFl4JzXN7olNx6vQHaEC?w=325&h=180&c=7&r=0&o=5&pid=1.7" alt="Imagen 3" class="w-full h-64 object-cover rounded-lg">
         </div>
     </div>
   
