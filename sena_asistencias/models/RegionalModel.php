@@ -51,5 +51,65 @@ class RegionalModel {
             throw new Exception("Error de base de datos: " . $e->getMessage());
         }
     }
+
+    // Obtener una regional por su ID
+    public function obtenerRegionalPorId($id) {
+        try {
+            // Preparar la consulta SQL
+            $stmt = $this->db->prepare("SELECT * FROM regionales WHERE id = ?");
+            $stmt->execute([$id]);
+
+            // Verificar si se obtuvo un resultado
+            if ($stmt) {
+                return $stmt->fetch(PDO::FETCH_ASSOC);
+            } else {
+                throw new Exception("Error al obtener la regional.");
+            }
+        } catch (PDOException $e) {
+            // Capturar errores de la base de datos
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
+    }
+
+    // Editar una regional
+    public function editarRegional($id, $nombre) {
+        try {
+            // Validar que el nombre no esté vacío
+            if (empty($nombre)) {
+                throw new Exception("El nombre de la regional es requerido.");
+            }
+
+            // Preparar la consulta SQL
+            $stmt = $this->db->prepare("UPDATE regionales SET nombre = ? WHERE id = ?");
+
+            // Ejecutar la consulta
+            if ($stmt->execute([$nombre, $id])) {
+                return true; // Éxito
+            } else {
+                throw new Exception("Error al actualizar la regional.");
+            }
+        } catch (PDOException $e) {
+            // Capturar errores de la base de datos
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
+    }
+
+    // Eliminar una regional
+   // Eliminar una regional
+public function eliminarRegional($id) {
+    try {
+        // Preparar la consulta SQL
+        $stmt = $this->db->prepare("DELETE FROM regionales WHERE id = ?");
+
+        // Ejecutar la consulta
+        if ($stmt->execute([$id])) {
+            return true; // Éxito
+        } else {
+            throw new Exception("Error al eliminar la regional.");
+        }
+    } catch (PDOException $e) {
+        // Capturar errores de la base de datos
+        throw new Exception("Error de base de datos: " . $e->getMessage());
+    }
 }
-?>
+}
