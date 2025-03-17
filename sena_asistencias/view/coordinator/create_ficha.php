@@ -57,16 +57,6 @@ $programas = $programaFormacionModel->obtenerProgramas();
                 </select>
             </div>
 
-            <div class="mb-4">
-                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
-                <input type="date" name="fecha_inicio" id="fecha_inicio" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha de Fin</label>
-                <input type="date" name="fecha_fin" id="fecha_fin" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-            </div>
-
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
                 Crear Ficha
             </button>
