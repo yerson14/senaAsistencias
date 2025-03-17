@@ -6,69 +6,85 @@
 <?php include '../partials/sidebar.php'; ?>
 
 <div class="ml-64 p-8">
-    <h1 class="text-3xl font-bold mb-6">Tomar Asistencia</h1>
-    <form action="../../controllers/InstructorController.php?action=take_attendance" method="POST" class="bg-white p-6 rounded-lg shadow-md">
-        
-        <div class="grid grid-cols-2 gap-4 mb-4">
+    <h1 class="text-3xl font-bold mb-6 text-center">Tomar Asistencia</h1> <!-- Título centrado -->
+    
+    <!-- Contenedor del cuadro con ancho reducido y centrado -->
+    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-md mx-auto">
+        <form action="../../controllers/InstructorController.php?action=take_attendance" method="POST" class="space-y-4">
+            
+            <!-- Ficha -->
             <div>
-                <label for="ficha_id" class="block text-sm font-medium text-gray-700">Ficha</label>
-                <select name="ficha_id" id="ficha_id" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="ficha_id" class="block text-sm font-medium text-gray-700 text-center">Ficha</label>
+                <select name="ficha_id" id="ficha_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
                     <!-- Opciones de fichas -->
                 </select>
             </div>
+            
+            <!-- Ambiente -->
             <div>
-                <label for="ambiente_id" class="block text-sm font-medium text-gray-700">Ambiente</label>
-                <select name="ambiente_id" id="ambiente_id" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="ambiente_id" class="block text-sm font-medium text-gray-700 text-center">Ambiente</label>
+                <select name="ambiente_id" id="ambiente_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
                     <!-- Opciones de ambientes -->
                 </select>
             </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4 mb-4">
+            
+            <!-- Programa de Formación -->
             <div>
-                <label for="programa_formacion" class="block text-sm font-medium text-gray-700">Programa de Formación</label>
-                <input type="text" name="programa_formacion" id="programa_formacion" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="programa_formacion" class="block text-sm font-medium text-gray-700 text-center">Programa de Formación</label>
+                <input type="text" name="programa_formacion" id="programa_formacion" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
+            
+            <!-- Fecha -->
             <div>
-                <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                <input type="date" name="fecha" id="fecha" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="fecha" class="block text-sm font-medium text-gray-700 text-center">Fecha</label>
+                <input type="date" name="fecha" id="fecha" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4 mb-4">
+            
+            <!-- Fecha de Inicio -->
             <div>
-                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
-                <input type="date" name="fecha_inicio" id="fecha_inicio" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700 text-center">Fecha de Inicio</label>
+                <input type="date" name="fecha_inicio" id="fecha_inicio" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
+            
+            <!-- Fecha de Fin -->
             <div>
-                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha de Fin</label>
-                <input type="date" name="fecha_fin" id="fecha_fin" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="fecha_fin" class="block text-sm font-medium text-gray-700 text-center">Fecha de Fin</label>
+                <input type="date" name="fecha_fin" id="fecha_fin" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
-        </div>
-        
-        <div class="grid grid-cols-2 gap-4 mb-4">
+            
+            <!-- Hora de Inicio -->
             <div>
-                <label for="hora_inicio" class="block text-sm font-medium text-gray-700">Hora de Inicio</label>
-                <input type="time" name="hora_inicio" id="hora_inicio" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="hora_inicio" class="block text-sm font-medium text-gray-700 text-center">Hora de Inicio</label>
+                <input type="time" name="hora_inicio" id="hora_inicio" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
+            
+            <!-- Hora de Fin -->
             <div>
-                <label for="hora_fin" class="block text-sm font-medium text-gray-700">Hora de Fin</label>
-                <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="hora_fin" class="block text-sm font-medium text-gray-700 text-center">Hora de Fin</label>
+                <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
-        </div>
-        
-        <div class="mb-4">
-            <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
-            <select name="estado" id="estado" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
-                <option value="presente">Presente</option>
-                <option value="ausente">Ausente</option>
-            </select>
-        </div>
-        
-        <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300">
-            Tomar Asistencia
-        </button>
-    </form>
+            
+            <!-- Estado (Reemplazado por opciones de radio) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 text-center">Estado</label>
+                <div class="mt-1 flex justify-center space-x-4">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="estado" value="presente" class="form-radio h-4 w-4 text-blue-600" required>
+                        <span class="ml-2 text-gray-700">Presente</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="estado" value="ausente" class="form-radio h-4 w-4 text-blue-600" required>
+                        <span class="ml-2 text-gray-700">Ausente</span>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Botón de enviar -->
+            <button type="submit" class="w-full max-w-xs bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 mx-auto block">
+                Tomar Asistencia
+            </button>
+        </form>
+    </div>
 </div>
 
 <?php include '../partials/footer.php'; ?>
