@@ -8,16 +8,21 @@ class InstructorController {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    // Tomar lista de asistencia
-    public function tomarLista($ficha_id, $ambiente_id, $instructor_id, $fecha, $estado) {
-        $stmt = $this->db->prepare("INSERT INTO asistencias (ficha_id, ambiente_id, instructor_id, fecha, estado) VALUES (?, ?, ?, ?, ?)");
-        return $stmt->execute([$ficha_id, $ambiente_id, $instructor_id, $fecha, $estado]);
+    public function obtenerAprendices($ficha_id) {
+        $stmt = $this->db->prepare("SELECT id, nombre AS name FROM aprendices WHERE ficha_id = ?");
+        $stmt->execute([$ficha_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // Obtener reportes de asistencias por ficha
-    public function obtenerReportesPorFicha($ficha_id) {
-        $stmt = $this->db->prepare("SELECT * FROM asistencias WHERE ficha_id = ?");
-        $stmt->execute([$ficha_id]);
+    public function obtenerFichas() {
+        $stmt = $this->db->prepare("SELECT id, nombre AS name FROM fichas");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obtenerAmbientes() {
+        $stmt = $this->db->prepare("SELECT id, nombre AS name FROM ambientes");
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

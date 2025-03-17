@@ -24,4 +24,12 @@ class AmbienteModel {
         $stmt->execute([$centro_id]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    // Obtener todos los ambientes
+    public function obtenerAmbientes() {
+        $stmt = $this->db->prepare("SELECT * FROM ambientes");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
+?>

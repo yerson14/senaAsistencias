@@ -27,4 +27,39 @@ class InstructorModel {
             throw new Exception("Error de base de datos: " . $e->getMessage());
         }
     }
+
+    // Obtener todas las fichas
+    public function getFichas() {
+        $stmt = $this->db->prepare("SELECT id, nombre FROM fichas");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Obtener aprendices por ficha
+    public function getAprendices($ficha_id) {
+        $stmt = $this->db->prepare("SELECT id, nombre FROM aprendices WHERE ficha_id = ?");
+        $stmt->execute([$ficha_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Obtener ambientes
+    public function getAmbientes() {
+        $stmt = $this->db->prepare("SELECT id, nombre FROM ambientes");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Obtener inasistencias de un aprendiz
+    public function getInasistencias($aprendiz_id) {
+        $stmt = $this->db->prepare("SELECT fecha FROM asistencias WHERE aprendiz_id = ? AND asistio = 0");
+        $stmt->execute([$aprendiz_id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Registrar asistencia
+    public function tomarLista($aprendiz_id, $fecha, $asistio) {
+        $stmt = $this->db->prepare("INSERT INTO asistencias (aprendiz_id, fecha, asistio) VALUES (?, ?, ?)");
+        return $stmt->execute([$aprendiz_id, $fecha, $asistio]);
+    }
 }
+?>
