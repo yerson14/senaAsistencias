@@ -83,12 +83,12 @@ $regionales = $regionalModel->obtenerRegionales();
                     <p class="text-gray-600">ID: <?php echo $centro['id']; ?></p>
                     <p class="text-gray-600">Regional: <?php echo $centro['regional_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <a href="editar_centro.php?id=<?php echo $centro['id']; ?>" class="text-blue-500 hover:text-blue-700">
+                        <a href="edit_center.php?id=<?php echo $centro['id']; ?>" class="text-blue-500 hover:text-blue-700">
                             <i class="fas fa-edit"></i> Editar
                         </a>
-                        <a href="../../controllers/SuperAdminController.php?action=delete_centro&id=<?php echo $centro['id']; ?>" class="text-red-500 hover:text-red-700">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </a>
+                        <a href="../../controllers/SuperAdminController.php?action=delete_center&id=<?php echo $centro['id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('¿Estás seguro de que deseas eliminar este centro?');">
+    <i class="fas fa-trash"></i> Eliminar
+</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -106,10 +106,5 @@ $regionales = $regionalModel->obtenerRegionales();
     </script>
 
     <?php include '../partials/footer.php'; ?>
-    <?php if (isset($_SESSION['error'])): ?>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
-    </div>
-<?php endif; ?>
 </body>
 </html>

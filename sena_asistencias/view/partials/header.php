@@ -7,7 +7,7 @@
     <!-- Contenedor para los íconos de SENA, perfil y logout -->
     <div class="flex items-center space-x-4">
         <!-- Ícono del SENA -->
-        <img src="ruta/a/logo-sena.png" alt="Logo SENA" class="h-8 w-8"> <!-- Cambia la ruta a la de tu logo -->
+        <img src="../../assets/images/logoSena.png" alt="Logo SENA" class="h-8 w-8"> <!-- Cambia la ruta a la de tu logo -->
         
         <!-- Ícono de perfil -->
         <a href="ruta/a/perfil" class="text-white hover:text-gray-200">

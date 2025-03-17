@@ -95,21 +95,20 @@ class RegionalModel {
     }
 
     // Eliminar una regional
-   // Eliminar una regional
-public function eliminarRegional($id) {
-    try {
-        // Preparar la consulta SQL
-        $stmt = $this->db->prepare("DELETE FROM regionales WHERE id = ?");
+    public function eliminarRegional($id) {
+        try {
+            // Preparar la consulta SQL
+            $stmt = $this->db->prepare("DELETE FROM regionales WHERE id = ?");
 
-        // Ejecutar la consulta
-        if ($stmt->execute([$id])) {
-            return true; // Éxito
-        } else {
-            throw new Exception("Error al eliminar la regional.");
+            // Ejecutar la consulta
+            if ($stmt->execute([$id])) {
+                return true; // Éxito
+            } else {
+                throw new Exception("Error al eliminar la regional.");
+            }
+        } catch (PDOException $e) {
+            // Capturar errores de la base de datos
+            throw new Exception("Error de base de datos: " . $e->getMessage());
         }
-    } catch (PDOException $e) {
-        // Capturar errores de la base de datos
-        throw new Exception("Error de base de datos: " . $e->getMessage());
     }
-}
 }
