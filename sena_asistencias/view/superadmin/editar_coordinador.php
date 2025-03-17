@@ -17,12 +17,16 @@ $centroModel = new CentroModel();
 $id = $_GET['id'];
 
 // Obtener la información del coordinador
-$coordinador = $usuarioModel->obtenerCoordinadores($id);
+$coordinador = $usuarioModel->obtenerCoordinadores(); // Obtener todos los coordinadores
+$coordinador = array_filter($coordinador, function ($c) use ($id) {
+    return $c['id'] == $id; // Filtrar por el ID del coordinador
+});
+$coordinador = reset($coordinador); // Obtener el primer resultado
 
 // Verificar si el coordinador existe
 if (!$coordinador) {
     $_SESSION['error'] = "Coordinador no encontrado.";
-    header("Location: listar_coordinadores.php");
+    header("Location: create_coordinador.php");
     exit();
 }
 
@@ -85,25 +89,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Formulario para editar coordinador -->
         <form action="editar_coordinador.php?id=<?php echo $id; ?>" method="POST">
-        <div class="mb-4">
-    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-    <input type="text" name="nombre" id="nombre" value="<?php echo $coordinador['nombre']; ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-</div>
-<div class="mb-4">
-    <label for="correo" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-    <input type="email" name="correo" id="correo" value="<?php echo $coordinador['correo']; ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-</div>
-<div class="mb-4">
-    <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de Identificación</label>
-    <input type="text" name="numero_identificacion" id="numero_identificacion" value="<?php echo $coordinador['numero_identificacion']; ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-</div>
+            <div class="mb-4">
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
+                <input type="text" name="nombre" id="nombre" value="<?php echo htmlspecialchars($coordinador['nombre'] ?? ''); ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="correo" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" name="correo" id="correo" value="<?php echo htmlspecialchars($coordinador['correo'] ?? ''); ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div class="mb-4">
+                <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de Identificación</label>
+                <input type="text" name="numero_identificacion" id="numero_identificacion" value="<?php echo htmlspecialchars($coordinador['numero_identificacion'] ?? ''); ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
             <div class="mb-4">
                 <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro</label>
                 <select name="centro_id" id="centro_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Seleccione un centro</option>
                     <?php foreach ($centros as $centro): ?>
-                        <option value="<?php echo $centro['id']; ?>" <?php echo ($centro['id'] == $coordinador['centro_id']) ? 'selected' : ''; ?>>
-                            <?php echo $centro['nombre']; ?>
+                        <option value="<?php echo $centro['id']; ?>" <?php echo ($centro['id'] == ($coordinador['centro_id'] ?? '')) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($centro['nombre']); ?>
                         </option>
                     <?php endforeach; ?>
                 </select>

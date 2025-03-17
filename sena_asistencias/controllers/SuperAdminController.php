@@ -70,7 +70,7 @@ class SuperAdminController
         } catch (Exception $e) {
             // Capturar errores y mostrar mensajes
             $_SESSION['error'] = $e->getMessage();
-            header("Location: ../view/superadmin/crear_coordinador.php"); // Redirigir al formulario de creación
+            header("Location: ../view/superadmin/create_coordinador.php"); // Redirigir al formulario de creación
             exit();
         }
     }
