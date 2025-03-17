@@ -1,51 +1,6 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 13-03-2025 a las 02:37:32
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
-
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Base de datos: `sena_asistencia`
----
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `ambientes`
---
-
-CREATE TABLE `ambientes` (
+CREATE TABLE `regionales` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `centro_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `asistencias`
---
-
-CREATE TABLE `asistencias` (
-  `id` int(11) NOT NULL,
-  `ficha_id` int(11) NOT NULL,
-  `ambiente_id` int(11) NOT NULL,
-  `instructor_id` int(11) NOT NULL,
-  `fecha` date NOT NULL,
-  `estado` enum('presente','ausente') NOT NULL
+  `nombre` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -63,30 +18,6 @@ CREATE TABLE `centros` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `fichas`
---
-
-CREATE TABLE `fichas` (
-  `id` int(11) NOT NULL,
-  `codigo` varchar(50) NOT NULL,
-  `programa_formacion_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `instructores`
---
-
-CREATE TABLE `instructores` (
-  `id` int(11) NOT NULL,
-  `usuario_id` int(11) NOT NULL,
-  `centro_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `programas_formacion`
 --
 
@@ -99,12 +30,25 @@ CREATE TABLE `programas_formacion` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `regionales`
+-- Estructura de tabla para la tabla `fichas`
 --
 
-CREATE TABLE `regionales` (
+CREATE TABLE `fichas` (
   `id` int(11) NOT NULL,
-  `nombre` varchar(100) NOT NULL
+  `codigo` varchar(50) NOT NULL,
+  `programa_formacion_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ambientes`
+--
+
+CREATE TABLE `ambientes` (
+  `id` int(11) NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `centro_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -128,9 +72,64 @@ CREATE TABLE `usuarios` (
 INSERT INTO `usuarios` (`id`, `nombre`, `correo`, `numero_identificacion`, `rol`) VALUES
 (1, 'Super Admin', 'superadmin@sena.edu.co', '123456789', 'superadmin');
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `instructores`
+--
+
+CREATE TABLE `instructores` (
+  `id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `centro_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `asistencias`
+--
+
+CREATE TABLE `asistencias` (
+  `id` int(11) NOT NULL,
+  `ficha_id` int(11) NOT NULL,
+  `ambiente_id` int(11) NOT NULL,
+  `instructor_id` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `estado` enum('presente','ausente') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `regionales`
+--
+ALTER TABLE `regionales`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `centros`
+--
+ALTER TABLE `centros`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `regional_id` (`regional_id`);
+
+--
+-- Indices de la tabla `programas_formacion`
+--
+ALTER TABLE `programas_formacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `centro_id` (`centro_id`);
+
+--
+-- Indices de la tabla `fichas`
+--
+ALTER TABLE `fichas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`),
+  ADD KEY `programa_formacion_id` (`programa_formacion_id`);
 
 --
 -- Indices de la tabla `ambientes`
@@ -138,6 +137,21 @@ INSERT INTO `usuarios` (`id`, `nombre`, `correo`, `numero_identificacion`, `rol`
 ALTER TABLE `ambientes`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nombre` (`nombre`),
+  ADD KEY `centro_id` (`centro_id`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `numero_identificacion` (`numero_identificacion`);
+
+--
+-- Indices de la tabla `instructores`
+--
+ALTER TABLE `instructores`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `usuario_id` (`usuario_id`),
   ADD KEY `centro_id` (`centro_id`);
 
 --
@@ -150,62 +164,13 @@ ALTER TABLE `asistencias`
   ADD KEY `instructor_id` (`instructor_id`);
 
 --
--- Indices de la tabla `centros`
---
-ALTER TABLE `centros`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `regional_id` (`regional_id`);
-
---
--- Indices de la tabla `fichas`
---
-ALTER TABLE `fichas`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `codigo` (`codigo`),
-  ADD KEY `programa_formacion_id` (`programa_formacion_id`);
-
---
--- Indices de la tabla `instructores`
---
-ALTER TABLE `instructores`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id` (`usuario_id`),
-  ADD KEY `centro_id` (`centro_id`);
-
---
--- Indices de la tabla `programas_formacion`
---
-ALTER TABLE `programas_formacion`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `centro_id` (`centro_id`);
-
---
--- Indices de la tabla `regionales`
---
-ALTER TABLE `regionales`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `usuarios`
---
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `numero_identificacion` (`numero_identificacion`);
-
---
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT de la tabla `ambientes`
+-- AUTO_INCREMENT de la tabla `regionales`
 --
-ALTER TABLE `ambientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `asistencias`
---
-ALTER TABLE `asistencias`
+ALTER TABLE `regionales`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -215,27 +180,21 @@ ALTER TABLE `centros`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `fichas`
---
-ALTER TABLE `fichas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `instructores`
---
-ALTER TABLE `instructores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `programas_formacion`
 --
 ALTER TABLE `programas_formacion`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `regionales`
+-- AUTO_INCREMENT de la tabla `fichas`
 --
-ALTER TABLE `regionales`
+ALTER TABLE `fichas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `ambientes`
+--
+ALTER TABLE `ambientes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -245,22 +204,20 @@ ALTER TABLE `usuarios`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- Restricciones para tablas volcadas
+-- AUTO_INCREMENT de la tabla `instructores`
 --
+ALTER TABLE `instructores`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Filtros para la tabla `ambientes`
---
-ALTER TABLE `ambientes`
-  ADD CONSTRAINT `ambientes_ibfk_1` FOREIGN KEY (`centro_id`) REFERENCES `centros` (`id`);
-
---
--- Filtros para la tabla `asistencias`
+-- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`ficha_id`) REFERENCES `fichas` (`id`),
-  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
-  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`instructor_id`) REFERENCES `instructores` (`id`);
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Restricciones para tablas volcadas
+--
 
 --
 -- Filtros para la tabla `centros`
@@ -269,10 +226,22 @@ ALTER TABLE `centros`
   ADD CONSTRAINT `centros_ibfk_1` FOREIGN KEY (`regional_id`) REFERENCES `regionales` (`id`);
 
 --
+-- Filtros para la tabla `programas_formacion`
+--
+ALTER TABLE `programas_formacion`
+  ADD CONSTRAINT `programas_formacion_ibfk_1` FOREIGN KEY (`centro_id`) REFERENCES `centros` (`id`);
+
+--
 -- Filtros para la tabla `fichas`
 --
 ALTER TABLE `fichas`
   ADD CONSTRAINT `fichas_ibfk_1` FOREIGN KEY (`programa_formacion_id`) REFERENCES `programas_formacion` (`id`);
+
+--
+-- Filtros para la tabla `ambientes`
+--
+ALTER TABLE `ambientes`
+  ADD CONSTRAINT `ambientes_ibfk_1` FOREIGN KEY (`centro_id`) REFERENCES `centros` (`id`);
 
 --
 -- Filtros para la tabla `instructores`
@@ -282,12 +251,10 @@ ALTER TABLE `instructores`
   ADD CONSTRAINT `instructores_ibfk_2` FOREIGN KEY (`centro_id`) REFERENCES `centros` (`id`);
 
 --
--- Filtros para la tabla `programas_formacion`
+-- Filtros para la tabla `asistencias`
 --
-ALTER TABLE `programas_formacion`
-  ADD CONSTRAINT `programas_formacion_ibfk_1` FOREIGN KEY (`centro_id`) REFERENCES `centros` (`id`);
+ALTER TABLE `asistencias`
+  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`ficha_id`) REFERENCES `fichas` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`instructor_id`) REFERENCES `instructores` (`id`);
 COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
