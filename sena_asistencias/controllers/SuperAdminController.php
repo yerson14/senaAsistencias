@@ -122,8 +122,7 @@ class SuperAdminController
     }
 
     // Método para crear un centro
-    public function create_center($nombre, $regional_id)
-    {
+    public function create_center($nombre, $regional_id) {
         try {
             // Validar que los campos no estén vacíos
             if (empty($nombre)) {
@@ -132,7 +131,7 @@ class SuperAdminController
             if (empty($regional_id)) {
                 throw new Exception("Debe seleccionar una regional.");
             }
-
+    
             // Usar el modelo CentroModel para crear el centro
             $centroModel = new CentroModel();
             if ($centroModel->crearCentro($nombre, $regional_id)) {

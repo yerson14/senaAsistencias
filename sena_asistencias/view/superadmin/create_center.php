@@ -54,24 +54,24 @@ $regionales = $regionalModel->obtenerRegionales();
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Centro</h2>
                 <form action="../../controllers/SuperAdminController.php?action=create_center" method="POST">
-                    <div class="mb-4">
-                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Centro</label>
-                        <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="regional_id" class="block text-sm font-medium text-gray-700">Regional</label>
-                        <select name="regional_id" id="regional_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">Seleccione una regional</option>
-                            <?php foreach ($regionales as $regional): ?>
-                                <option value="<?php echo $regional['id']; ?>"><?php echo $regional['nombre']; ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Guardar</button>
-                    </div>
-                </form>
+    <div class="mb-4">
+        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre del Centro</label>
+        <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+    </div>
+    <div class="mb-4">
+        <label for="regional_id" class="block text-sm font-medium text-gray-700">Regional</label>
+        <select name="regional_id" id="regional_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            <option value="">Seleccione una regional</option>
+            <?php foreach ($regionales as $regional): ?>
+                <option value="<?php echo $regional['id']; ?>"><?php echo $regional['nombre']; ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="flex justify-end">
+        <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Guardar</button>
+    </div>
+</form>
             </div>
         </div>
 

@@ -1,5 +1,6 @@
 <?php
-require_once '../../config/Database.php'; // Asegúrate de que la ruta sea correcta
+require_once __DIR__ .'../../config/Database.php'; // Asegúrate de que la ruta sea correcta
+
 
 class ProgramaFormacionModel
 {
@@ -24,11 +25,11 @@ class ProgramaFormacionModel
     }
 
     // Método para crear un nuevo programa de formación
-    public function crearPrograma($nombre)
+    public function crearPrograma($nombre, $centro_id)
     {
         try {
-            $stmt = $this->db->prepare("INSERT INTO programas_formacion (nombre) VALUES (?)");
-            return $stmt->execute([$nombre]);
+            $stmt = $this->db->prepare("INSERT INTO programas_formacion (nombre, centro_id) VALUES (?, ?)");
+            return $stmt->execute([$nombre, $centro_id]);
         } catch (PDOException $e) {
             // Manejar errores de base de datos
             throw new Exception("Error al crear el programa de formación: " . $e->getMessage());
@@ -36,11 +37,11 @@ class ProgramaFormacionModel
     }
 
     // Método para editar un programa de formación
-    public function editarPrograma($id, $nombre)
+    public function editarPrograma($id, $nombre, $centro_id)
     {
         try {
-            $stmt = $this->db->prepare("UPDATE programas_formacion SET nombre = ? WHERE id = ?");
-            return $stmt->execute([$nombre, $id]);
+            $stmt = $this->db->prepare("UPDATE programas_formacion SET nombre = ?, centro_id = ? WHERE id = ?");
+            return $stmt->execute([$nombre, $centro_id, $id]);
         } catch (PDOException $e) {
             // Manejar errores de base de datos
             throw new Exception("Error al editar el programa de formación: " . $e->getMessage());

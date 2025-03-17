@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once '../../config/Database.php'; // Asegúrate de que la ruta sea correcta
-require_once '../../models/ProgramaFormacionModel.php'; // Asegúrate de que la ruta sea correcta
+require_once '../../config/Database.php';
+require_once '../../models/ProgramaFormacionModel.php';
 
 // Obtener los programas de formación desde la base de datos
 $programaFormacionModel = new ProgramaFormacionModel(Database::getInstance()->getConnection());
@@ -41,10 +41,10 @@ $programas = $programaFormacionModel->obtenerProgramas();
         <?php endif; ?>
 
         <!-- Formulario para crear una ficha -->
-        <form action="../../controllers/CoordinatorController.php?action=ficha" method="POST">
+        <form action="../../controllers/CoordinatorController.php?action=create_ficha" method="POST">
             <div class="mb-4">
-                <label for="nombre" class="block text-sm font-medium text-gray-700">Número de Ficha</label>
-                <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                <label for="numero" class="block text-sm font-medium text-gray-700">Número de Ficha</label>
+                <input type="text" name="numero" id="numero" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
 
             <div class="mb-4">
@@ -55,6 +55,16 @@ $programas = $programaFormacionModel->obtenerProgramas();
                         <option value="<?php echo $programa['id']; ?>"><?php echo $programa['nombre']; ?></option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+
+            <div class="mb-4">
+                <label for="fecha_inicio" class="block text-sm font-medium text-gray-700">Fecha de Inicio</label>
+                <input type="date" name="fecha_inicio" id="fecha_inicio" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+
+            <div class="mb-4">
+                <label for="fecha_fin" class="block text-sm font-medium text-gray-700">Fecha de Fin</label>
+                <input type="date" name="fecha_fin" id="fecha_fin" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
 
             <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600">
