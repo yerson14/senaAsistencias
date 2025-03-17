@@ -1,5 +1,5 @@
 <?php
-require_once '../config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 class FichaModel {
     private $db;
@@ -8,9 +8,9 @@ class FichaModel {
         $this->db = Database::getInstance()->getConnection();
     }
 
-    public function crearFicha($numero, $programa_id, $fecha_inicio, $fecha_fin) {
-        $stmt = $this->db->prepare("INSERT INTO fichas (codigo, programa_formacion_id, fecha_inicio, fecha_fin) VALUES (?, ?, ?, ?)");
-        return $stmt->execute([$numero, $programa_id, $fecha_inicio, $fecha_fin]);
+    public function crearFicha($numero, $programa_id) {
+        $stmt = $this->db->prepare("INSERT INTO fichas (codigo, programa_formacion_id) VALUES (?, ?, ?, ?)");
+        return $stmt->execute([$numero, $programa_id]);
     }
 
     public function obtenerFichasPorPrograma($programa_id) {

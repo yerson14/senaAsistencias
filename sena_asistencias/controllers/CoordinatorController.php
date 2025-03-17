@@ -84,11 +84,11 @@ class CoordinadorController
         }
     }
 
-    public function crearFicha($numero, $programa_id, $fecha_inicio, $fecha_fin)
+    public function crearFicha($numero, $programa_id)
     {
         try {
             // Validar que los campos no estén vacíos
-            if (empty($numero) || empty($programa_id) || empty($fecha_inicio) || empty($fecha_fin)) {
+            if (empty($numero) || empty($programa_id)) {
                 throw new Exception("Todos los campos son requeridos.");
             }
 
@@ -97,14 +97,11 @@ class CoordinadorController
                 throw new Exception("El número de ficha y el ID del programa deben ser números.");
             }
 
-            // Validar que las fechas sean válidas
-            if (!strtotime($fecha_inicio) || !strtotime($fecha_fin)) {
-                throw new Exception("Las fechas ingresadas no son válidas.");
-            }
+          
 
             // Usar el modelo FichaModel para crear la ficha
             $fichaModel = new FichaModel($this->db);
-            if ($fichaModel->crearFicha($numero, $programa_id, $fecha_inicio, $fecha_fin)) {
+            if ($fichaModel->crearFicha($numero, $programa_id)) {
                 $_SESSION['success'] = "Ficha creada exitosamente.";
                 header("Location: /senaAsistencias/sena_asistencias/view/coordinator/index.php");
                 exit();
@@ -180,9 +177,7 @@ if (isset($_GET['action'])) {
     if ($action === 'create_ficha' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $numero = $_POST['numero'];
         $programa_id = $_POST['programa_id'];
-        $fecha_inicio = $_POST['fecha_inicio'];
-        $fecha_fin = $_POST['fecha_fin'];
-        $coordinadorController->crearFicha($numero, $programa_id, $fecha_inicio, $fecha_fin);
+        $coordinadorController->crearFicha($numero, $programa_id);
     }
     
     // Acción para crear un programa
