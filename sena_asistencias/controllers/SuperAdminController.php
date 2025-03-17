@@ -35,6 +35,36 @@ class SuperAdminController {
             exit();
         }
     }
+    public function create_center() {
+        // Verificar si se enviaron los datos del formulario
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Obtener los datos del formulario
+            $nombre = $_POST['nombre'];
+            $regional_id = $_POST['regional_id'];
+    
+            // Validar los datos (puedes agregar más validaciones si es necesario)
+            if (empty($nombre) || empty($regional_id)) {
+                $_SESSION['error'] = "Todos los campos son obligatorios.";
+                header("Location: ../views/superadmin/crear_centro.php");
+                exit();
+            }
+    
+            // Guardar el centro en la base de datos
+            $centroModel = new CentroModel(Database::getInstance()->getConnection());
+            $centro_id = $centroModel->crearCentro($nombre, $regional_id);
+    
+            if ($centro_id) {
+                // Redirigir a la página que muestra el centro creado
+                $_SESSION['success'] = "Centro creado exitosamente.";
+                header("Location: ../views/superadmin/mostrar_centro.php?id=" . $centro_id);
+                exit();
+            } else {
+                $_SESSION['error'] = "Error al crear el centro.";
+                header("Location: ../views/superadmin/crear_centro.php");
+                exit();
+            }
+        }
+    }
 
     // Método para editar una regional
     public function edit_regional($id, $nombre) {
