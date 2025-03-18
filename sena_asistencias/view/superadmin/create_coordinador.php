@@ -92,7 +92,6 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
                 <div class="bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-2"><?php echo $coordinador['nombre']; ?></h2>
                     <p class="text-gray-600">Correo: <?php echo $coordinador['correo']; ?></p>
-                    <p class="text-gray-600">Identificación: <?php echo $coordinador['numero_identificacion']; ?></p>
                     <p class="text-gray-600">Centro: <?php echo $coordinador['centro_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">
                         <a href="editar_coordinador.php?id=<?php echo $coordinador['id']; ?>" class="text-blue-500 hover:text-blue-700">
