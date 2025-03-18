@@ -234,38 +234,71 @@ public function eliminarFicha($id)
     exit();
 }
     // Crear un instructor
-    public function crearInstructor($nombre, $correo, $numero_identificacion, $centro_id)
-    {
-        try {
-            // Validar que los campos no estén vacíos
-            if (empty($nombre) || empty($correo) || empty($numero_identificacion) || empty($centro_id)) {
-                throw new Exception("Todos los campos son requeridos.");
-            }
-
-            // Validar que el centro_id sea un número
-            if (!is_numeric($centro_id)) {
-                throw new Exception("El ID del centro debe ser un número.");
-            }
-
-            // Usar el modelo InstructorModel para crear el instructor
-            $instructorModel = new InstructorModel($this->db);
-            if ($instructorModel->crearInstructor($nombre, $correo, $numero_identificacion, $centro_id)) {
-                $_SESSION['success'] = "Instructor creado exitosamente.";
-                header("Location: /senaAsistencias/sena_asistencias/view/coordinator/index.php");
-                exit();
-            } else {
-                throw new Exception("Error al crear el instructor.");
-            }
-        } catch (PDOException $e) {
-            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-            header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_instructor.php");
-            exit();
-        } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
-            header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_instructor.php");
-            exit();
+   // Crear un instructor
+public function crearInstructor($nombre, $correo, $numero_identificacion, $centro_id) {
+    try {
+        if (empty($nombre) || empty($correo) || empty($numero_identificacion) || empty($centro_id)) {
+            throw new Exception("Todos los campos son requeridos.");
         }
+
+        $instructorModel = new InstructorModel($this->db);
+        if ($instructorModel->crearInstructor($nombre, $correo, $numero_identificacion, $centro_id)) {
+            $_SESSION['success'] = "Instructor creado exitosamente.";
+        } else {
+            throw new Exception("Error al crear el instructor.");
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
     }
+
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    exit();
+}
+
+// Actualizar un instructor
+public function actualizarInstructor($id, $nombre, $correo, $numero_identificacion, $centro_id) {
+    try {
+        if (empty($nombre) || empty($correo) || empty($numero_identificacion) || empty($centro_id)) {
+            throw new Exception("Todos los campos son requeridos.");
+        }
+
+        $instructorModel = new InstructorModel($this->db);
+        if ($instructorModel->actualizarInstructor($id, $nombre, $correo, $numero_identificacion, $centro_id)) {
+            $_SESSION['success'] = "Instructor actualizado exitosamente.";
+        } else {
+            throw new Exception("Error al actualizar el instructor.");
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
+
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    exit();
+}
+
+// Eliminar un instructor
+public function eliminarInstructor($id) {
+    try {
+        $instructorModel = new InstructorModel($this->db);
+        if ($instructorModel->eliminarInstructor($id)) {
+            $_SESSION['success'] = "Instructor eliminado exitosamente.";
+        } else {
+            throw new Exception("Error al eliminar el instructor.");
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
+    }
+
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    exit();
+}
+
 
     // Obtener todos los centros
     public function obtenerCentros()
@@ -406,12 +439,28 @@ if (isset($_GET['action'])) {
         $coordinadorController->eliminarFicha($id);
     }
 
-    // Acción para crear un instructor
-    if ($action === 'create_instructor' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+       // Acción para crear un instructor
+       if ($action === 'create_instructor' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombre = $_POST['nombre'];
         $correo = $_POST['correo'];
         $numero_identificacion = $_POST['numero_identificacion'];
         $centro_id = $_POST['centro_id'];
         $coordinadorController->crearInstructor($nombre, $correo, $numero_identificacion, $centro_id);
+    }
+
+    // Acción para actualizar un instructor
+    if ($action === 'update_instructor' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_GET['id'];
+        $nombre = $_POST['nombre'];
+        $correo = $_POST['correo'];
+        $numero_identificacion = $_POST['numero_identificacion'];
+        $centro_id = $_POST['centro_id'];
+        $coordinadorController->actualizarInstructor($id, $nombre, $correo, $numero_identificacion, $centro_id);
+    }
+
+    // Acción para eliminar un instructor
+    if ($action === 'delete_instructor' && isset($_GET['id'])) {
+        $id = $_GET['id'];
+        $coordinadorController->eliminarInstructor($id);
     }
 }
