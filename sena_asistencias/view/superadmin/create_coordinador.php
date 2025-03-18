@@ -56,7 +56,7 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
         <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Coordinador</h2>
-                <form action="../../controllers/SuperAdminController.php?action=create_coordinador" method="POST">
+                <form action="../../controllers/SuperAdminController.php?action=crear_coordinador" method="POST">
                     <div class="mb-4">
                         <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
                         <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>

@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Actualizar el coordinador
     if ($usuarioModel->editarCoordinador($id, $nombre, $correo, $numero_identificacion, $centro_id)) {
         $_SESSION['success'] = "Coordinador actualizado exitosamente.";
-        header("Location: listar_coordinadores.php");
+        header("Location: create_coordinador.php"); // Redirigir a create_coordinador.php
         exit();
     } else {
         $_SESSION['error'] = "Error al actualizar el coordinador.";

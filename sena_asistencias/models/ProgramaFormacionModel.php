@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ .'../../config/Database.php'; // Asegúrate de que la ruta sea correcta
-
+require_once __DIR__ . '/../config/Database.php';
 
 class ProgramaFormacionModel
 {
@@ -15,11 +14,10 @@ class ProgramaFormacionModel
     public function obtenerProgramas()
     {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM programas_formacion");
+            $stmt = $this->db->prepare("SELECT pf.*, c.nombre as centro_nombre FROM programas_formacion pf JOIN centros c ON pf.centro_id = c.id");
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            // Manejar errores de base de datos
             throw new Exception("Error al obtener los programas de formación: " . $e->getMessage());
         }
     }
@@ -31,7 +29,6 @@ class ProgramaFormacionModel
             $stmt = $this->db->prepare("INSERT INTO programas_formacion (nombre, centro_id) VALUES (?, ?)");
             return $stmt->execute([$nombre, $centro_id]);
         } catch (PDOException $e) {
-            // Manejar errores de base de datos
             throw new Exception("Error al crear el programa de formación: " . $e->getMessage());
         }
     }
@@ -43,7 +40,6 @@ class ProgramaFormacionModel
             $stmt = $this->db->prepare("UPDATE programas_formacion SET nombre = ?, centro_id = ? WHERE id = ?");
             return $stmt->execute([$nombre, $centro_id, $id]);
         } catch (PDOException $e) {
-            // Manejar errores de base de datos
             throw new Exception("Error al editar el programa de formación: " . $e->getMessage());
         }
     }
@@ -52,11 +48,27 @@ class ProgramaFormacionModel
     public function eliminarPrograma($id)
     {
         try {
+            // Eliminar fichas asociadas al programa
+            $stmt = $this->db->prepare("DELETE FROM fichas WHERE programa_formacion_id = ?");
+            $stmt->execute([$id]);
+
+            // Eliminar el programa
             $stmt = $this->db->prepare("DELETE FROM programas_formacion WHERE id = ?");
             return $stmt->execute([$id]);
         } catch (PDOException $e) {
-            // Manejar errores de base de datos
             throw new Exception("Error al eliminar el programa de formación: " . $e->getMessage());
+        }
+    }
+
+    // Método para obtener un programa por su ID
+    public function obtenerProgramaPorId($id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM programas_formacion WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener el programa: " . $e->getMessage());
         }
     }
 }

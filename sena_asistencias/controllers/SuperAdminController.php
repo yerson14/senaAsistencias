@@ -59,8 +59,6 @@ class SuperAdminController
                 $stmt = $this->db->prepare("INSERT INTO coordinadores (usuario_id, centro_id) VALUES (?, ?)");
                 if ($stmt->execute([$usuario_id, $centro_id])) {
                     $_SESSION['success'] = "Coordinador creado exitosamente.";
-                    header("Location: ../view/superadmin/index.php"); // Redirigir al dashboard
-                    exit();
                 } else {
                     throw new Exception("Error al asignar el coordinador al centro.");
                 }
@@ -70,9 +68,11 @@ class SuperAdminController
         } catch (Exception $e) {
             // Capturar errores y mostrar mensajes
             $_SESSION['error'] = $e->getMessage();
-            header("Location: ../view/superadmin/create_coordinador.php"); // Redirigir al formulario de creación
-            exit();
         }
+
+        // Redirigir al formulario de creación de coordinadores
+        header("Location: ../view/superadmin/create_coordinador.php");
+        exit();
     }
 
     // Método para editar una regional
@@ -131,7 +131,7 @@ class SuperAdminController
             if (empty($regional_id)) {
                 throw new Exception("Debe seleccionar una regional.");
             }
-    
+
             // Usar el modelo CentroModel para crear el centro
             $centroModel = new CentroModel();
             if ($centroModel->crearCentro($nombre, $regional_id)) {
@@ -148,51 +148,53 @@ class SuperAdminController
             exit();
         }
     }
+
     // Método para editar un centro
-public function edit_center($id, $nombre, $regional_id) {
-    try {
-        // Validar que los campos no estén vacíos
-        if (empty($nombre)) {
-            throw new Exception("El nombre del centro es requerido.");
+    public function edit_center($id, $nombre, $regional_id) {
+        try {
+            // Validar que los campos no estén vacíos
+            if (empty($nombre)) {
+                throw new Exception("El nombre del centro es requerido.");
+            }
+            if (empty($regional_id)) {
+                throw new Exception("Debe seleccionar una regional.");
+            }
+
+            // Usar el modelo CentroModel para editar el centro
+            $centroModel = new CentroModel();
+            if ($centroModel->editarCentro($id, $nombre, $regional_id)) {
+                $_SESSION['success'] = "Centro actualizado exitosamente.";
+                header("Location: ../view/superadmin/create_center.php"); // Redirigir a la gestión de centros
+                exit();
+            } else {
+                throw new Exception("Error al actualizar el centro.");
+            }
+        } catch (Exception $e) {
+            // Capturar errores y mostrar mensajes
+            $_SESSION['error'] = $e->getMessage();
+            header("Location: ../view/superadmin/edit_center.php?id=" . $id); // Redirigir al formulario de edición
+            exit();
         }
-        if (empty($regional_id)) {
-            throw new Exception("Debe seleccionar una regional.");
+    }
+
+    // Método para eliminar un centro
+    public function delete_center($id) {
+        try {
+            // Usar el modelo CentroModel para eliminar el centro
+            $centroModel = new CentroModel();
+            if ($centroModel->eliminarCentro($id)) {
+                $_SESSION['success'] = "Centro eliminado exitosamente.";
+            } else {
+                throw new Exception("Error al eliminar el centro.");
+            }
+        } catch (Exception $e) {
+            // Capturar errores y mostrar mensajes
+            $_SESSION['error'] = $e->getMessage();
         }
 
-        // Usar el modelo CentroModel para editar el centro
-        $centroModel = new CentroModel();
-        if ($centroModel->editarCentro($id, $nombre, $regional_id)) {
-            $_SESSION['success'] = "Centro actualizado exitosamente.";
-            header("Location: ../view/superadmin/create_center.php"); // Redirigir a la gestión de centros
-            exit();
-        } else {
-            throw new Exception("Error al actualizar el centro.");
-        }
-    } catch (Exception $e) {
-        // Capturar errores y mostrar mensajes
-        $_SESSION['error'] = $e->getMessage();
-        header("Location: ../view/superadmin/edit_center.php?id=" . $id); // Redirigir al formulario de edición
+        header("Location: ../view/superadmin/create_center.php"); // Redirigir a la gestión de centros
         exit();
     }
-}
-// Método para eliminar un centro
-public function delete_center($id) {
-    try {
-        // Usar el modelo CentroModel para eliminar el centro
-        $centroModel = new CentroModel();
-        if ($centroModel->eliminarCentro($id)) {
-            $_SESSION['success'] = "Centro eliminado exitosamente.";
-        } else {
-            throw new Exception("Error al eliminar el centro.");
-        }
-    } catch (Exception $e) {
-        // Capturar errores y mostrar mensajes
-        $_SESSION['error'] = $e->getMessage();
-    }
-
-    header("Location: ../view/superadmin/create_center.php"); // Redirigir a la gestión de centros
-    exit();
-}
 
     // Método para editar un coordinador
     public function edit_coordinador($id, $nombre, $correo, $numero_identificacion, $centro_id)
@@ -230,6 +232,11 @@ public function delete_center($id) {
     public function delete_coordinador($id)
     {
         try {
+            // Verificar si el ID es válido
+            if (empty($id)) {
+                throw new Exception("ID de coordinador no proporcionado.");
+            }
+
             // Eliminar la asignación del coordinador al centro
             $stmt = $this->db->prepare("DELETE FROM coordinadores WHERE usuario_id = ?");
             if ($stmt->execute([$id])) {
@@ -238,17 +245,18 @@ public function delete_center($id) {
                 if ($stmt->execute([$id])) {
                     $_SESSION['success'] = "Coordinador eliminado exitosamente.";
                 } else {
-                    throw new Exception("Error al eliminar el coordinador.");
+                    throw new Exception("Error al eliminar el coordinador de la tabla de usuarios.");
                 }
             } else {
                 throw new Exception("Error al eliminar la asignación del coordinador al centro.");
             }
         } catch (Exception $e) {
             // Capturar errores y mostrar mensajes
-            $_SESSION['error'] = $e->getMessage();
+            $_SESSION['error'] = "Error al eliminar el coordinador: " . $e->getMessage();
         }
 
-        header("Location: ../view/superadmin/index.php"); // Redirigir al dashboard
+        // Redirigir al formulario de creación de coordinadores
+        header("Location: ../view/superadmin/create_coordinador.php");
         exit();
     }
 }
@@ -270,18 +278,20 @@ if (isset($_GET['action'])) {
         $regional_id = $_POST['regional_id']; // Asegúrate de que este campo esté en el formulario
         $superAdminController->create_center($nombre, $regional_id);
     }
+
     // Acción para editar un centro
-if ($action === 'edit_center' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = $_POST['id'];
-    $nombre = $_POST['nombre'];
-    $regional_id = $_POST['regional_id'];
-    $superAdminController->edit_center($id, $nombre, $regional_id);
-}
-// Acción para eliminar un centro
-if ($action === 'delete_center' && isset($_GET['id'])) {
-    $id = $_GET['id'];
-    $superAdminController->delete_center($id);
-}
+    if ($action === 'edit_center' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+        $id = $_POST['id'];
+        $nombre = $_POST['nombre'];
+        $regional_id = $_POST['regional_id'];
+        $superAdminController->edit_center($id, $nombre, $regional_id);
+    }
+
+    // Acción para eliminar un centro
+    if ($action === 'delete_center' && isset($_GET['id'])) {
+        $id = $_GET['id'];
+        $superAdminController->delete_center($id);
+    }
 
     // Acción para crear un coordinador
     if ($action === 'crear_coordinador' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -303,5 +313,11 @@ if ($action === 'delete_center' && isset($_GET['id'])) {
     if ($action === 'delete_regional' && isset($_GET['id'])) {
         $id = $_GET['id'];
         $superAdminController->delete_regional($id);
+    }
+
+    // Acción para eliminar un coordinador
+    if ($action === 'delete_coordinador' && isset($_GET['id'])) {
+        $id = $_GET['id'];
+        $superAdminController->delete_coordinador($id);
     }
 }
