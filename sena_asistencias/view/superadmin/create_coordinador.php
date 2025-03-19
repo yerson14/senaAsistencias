@@ -48,12 +48,12 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
         <?php endif; ?>
 
         <!-- Botón flotante para agregar coordinador -->
-        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
+        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 z-50">
             <i class="fas fa-plus text-2xl"></i>
         </button>
 
         <!-- Modal para agregar coordinador -->
-        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Coordinador</h2>
                 <form action="../../controllers/SuperAdminController.php?action=crear_coordinador" method="POST">
