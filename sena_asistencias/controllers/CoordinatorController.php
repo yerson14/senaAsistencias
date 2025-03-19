@@ -253,7 +253,7 @@ public function crearInstructor($nombre, $correo, $numero_identificacion, $centr
         $_SESSION['error'] = $e->getMessage();
     }
 
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_instructor.php");
     exit();
 }
 
@@ -276,7 +276,7 @@ public function actualizarInstructor($id, $nombre, $correo, $numero_identificaci
         $_SESSION['error'] = $e->getMessage();
     }
 
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_instructor.php");
     exit();
 }
 
@@ -295,7 +295,7 @@ public function eliminarInstructor($id) {
         $_SESSION['error'] = $e->getMessage();
     }
 
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/instructores.php");
+    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_instructor.php");
     exit();
 }
 
