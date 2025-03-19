@@ -25,26 +25,27 @@ class InstructorController {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getAprendicesByFicha($fichaId) {
+        // Consulta para obtener los aprendices de la ficha seleccionada
+        $query = "SELECT id, nombre, numero_identificacion FROM aprendices WHERE ficha_id = :ficha_id";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam(':ficha_id', $fichaId, PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Devolver los resultados en formato JSON
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+    }
 }
 
-
-if ($_GET['action'] == 'get_estudiantes' && isset($_GET['ficha_id'])) {
-    $fichaId = $_GET['ficha_id'];
-    
-    // Aquí debes realizar la consulta a la base de datos para obtener los estudiantes de la ficha seleccionada
-    // Por ejemplo:
-    // $estudiantes = $db->query("SELECT nombre, apellido FROM estudiantes WHERE ficha_id = $fichaId")->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Simulación de datos (reemplaza esto con la consulta real a la base de datos)
-    $estudiantes = [
-        ['nombre' => 'Juan', 'apellido' => 'Pérez'],
-        ['nombre' => 'Ana', 'apellido' => 'Gómez'],
-        // Agrega más estudiantes según la ficha seleccionada
-    ];
-
-    // Devuelve los datos en formato JSON
-    header('Content-Type: application/json');
-    echo json_encode($estudiantes);
-    exit;
+// Manejo de la acción 'get_aprendices'
+if (isset($_GET['action']) && $_GET['action'] == 'get_aprendices') {
+    if (isset($_GET['ficha_id'])) {
+        $fichaId = $_GET['ficha_id'];
+        $controller = new InstructorController();
+        $controller->getAprendicesByFicha($fichaId);
+    } else {
+        echo json_encode(['error' => 'Ficha ID no proporcionado']);
+    }
 }
 ?>

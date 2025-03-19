@@ -42,7 +42,7 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
             <!-- Ficha -->
             <div>
                 <label for="ficha_id" class="block text-sm font-medium text-gray-700 text-center">Ficha</label>
-                <select name="ficha_id" id="ficha_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required onchange="cargarEstudiantes(this.value)">
+                <select name="ficha_id" id="ficha_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required onchange="cargarAprendices(this.value)">
                     <option value="">Seleccione una ficha</option>
                     <?php foreach ($fichas as $ficha): ?>
                         <option value="<?php echo $ficha['id']; ?>"><?php echo $ficha['codigo']; ?></option>
@@ -75,8 +75,6 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
                 <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
             </div>
 
-            <!-- Lista de estudiantes -->
-            <div id="lista-estudiantes" class="mt-4"></div>
 
         </form>
     </div>
@@ -96,44 +94,44 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
                 <th class="border border-gray-300 p-2">Asistencia</th>
             </tr>
         </thead>
-        <tbody id="lista-estudiantes">
+        <tbody id="lista-aprendices">
             <!-- Se llenará con JavaScript -->
         </tbody>
     </table>
 </div>
 
 <script>
-    function cargarEstudiantes(fichaId) {
+    function cargarAprendices(fichaId) {
         if (fichaId) {
-            fetch(`../../controllers/InstructorController.php?action=get_estudiantes&ficha_id=${fichaId}`)
+            fetch(`../../controllers/InstructorController.php?action=get_aprendices&ficha_id=${fichaId}`)
                 .then(response => response.json())
                 .then(data => {
-                    const listaEstudiantes = document.getElementById('lista-estudiantes');
+                    const listaAprendices = document.getElementById('lista-aprendices');
                     const asistenciaContainer = document.getElementById('asistencia-container');
-                    listaEstudiantes.innerHTML = '';
+                    listaAprendices.innerHTML = '';
 
                     if (data.length > 0) {
                         asistenciaContainer.classList.remove('hidden');
 
-                        data.forEach(estudiante => {
+                        data.forEach(aprendiz => {
                             const tr = document.createElement('tr');
 
                             tr.innerHTML = `
-                                <td class="border border-gray-300 p-2 text-center">${estudiante.nombre} ${estudiante.apellido}</td>
-                                <td class="border border-gray-300 p-2 text-center">${estudiante.fecha_inicio || 'N/A'}</td>
-                                <td class="border border-gray-300 p-2 text-center">${estudiante.hora_inicio || 'N/A'}</td>
-                                <td class="border border-gray-300 p-2 text-center">${estudiante.fecha_fin || 'N/A'}</td>
-                                <td class="border border-gray-300 p-2 text-center">${document.getElementById('ambiente_id').selectedOptions[0].text}</td>
-                                <td class="border border-gray-300 p-2 text-center">
-                                    <select name="asistencia[${estudiante.id}]" class="px-2 py-1 border rounded-md">
-                                        <option value="presente">Presente</option>
-                                        <option value="ausente">Ausente</option>
-                                        <option value="excusa">Excusa</option>
-                                    </select>
-                                </td>
-                            `;
+                            <td class="border border-gray-300 p-2 text-center">${aprendiz.nombre}</td>
+                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('fecha').value || 'N/A'}</td>
+                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('hora_inicio').value || 'N/A'}</td>
+                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('hora_fin').value || 'N/A'}</td>
+                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('ambiente_id').selectedOptions[0].text}</td>
+                            <td class="border border-gray-300 p-2 text-center">
+                                <select name="asistencia[${aprendiz.id}]" class="px-2 py-1 border rounded-md">
+                                    <option value="presente">Presente</option>
+                                    <option value="ausente">Ausente</option>
+                                    <option value="excusa">Excusa</option>
+                                </select>
+                            </td>
+                        `;
 
-                            listaEstudiantes.appendChild(tr);
+                            listaAprendices.appendChild(tr);
                         });
                     } else {
                         asistenciaContainer.classList.add('hidden');
