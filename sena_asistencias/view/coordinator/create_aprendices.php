@@ -64,11 +64,11 @@ $fichas = $fichaModel->obtenerFichas();
                         <input type="text" name="numero_identificacion" id="numero_identificacion" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
                     <div class="mb-4">
-    <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro</label>
-    <select name="centro_id" id="centro_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-        <option value="">Seleccione un centro</option>
-        <?php foreach ($centros as $centro): ?>
-            <option value="<?php echo $centro['id']; ?>"><?php echo $centro['nombre']; ?></option>
+    <label for="ficha_id" class="block text-sm font-medium text-gray-700">Ficha</label>
+    <select name="ficha_id" id="ficha_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        <option value="">Seleccione una ficha</option>
+        <?php foreach ($fichas as $ficha): ?>
+            <option value="<?php echo $ficha['id']; ?>"><?php echo $ficha['codigo']; ?></option>
         <?php endforeach; ?>
     </select>
 </div>

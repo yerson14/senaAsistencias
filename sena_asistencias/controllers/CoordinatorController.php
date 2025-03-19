@@ -542,7 +542,18 @@ if (isset($_GET['action'])) {
         $nombre = $_POST['nombre'];
         $numero_identificacion = $_POST['numero_identificacion'];
         $ficha_id = $_POST['ficha_id'];
-        $centro_id = $_POST['centro_id']; // Captura el centro_id
+    
+        // Obtener el centro_id asociado a la ficha
+        $ficha = $fichaModel->obtenerFichaPorId($ficha_id);
+        if (!$ficha) {
+            $_SESSION['error'] = "La ficha seleccionada no existe.";
+            header("Location: create_aprendiz.php");
+            exit();
+        }
+    
+        $centro_id = $ficha['centro_id']; // Obtener centro_id de la ficha
+    
+        // Crear el aprendiz
         $coordinadorController->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id);
     }
 

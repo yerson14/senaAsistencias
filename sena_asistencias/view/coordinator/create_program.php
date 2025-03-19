@@ -25,11 +25,11 @@ $centros = $centroModel->obtenerCentros();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <?php include '../partials/header.php'; ?>
     <?php include '../partials/sidebar.php'; ?>
 
-    <div class="ml-64 p-8">
+    <div class="flex-grow ml-64 p-8">
         <h1 class="text-3xl font-bold mb-6">Gestión de Programas de Formación</h1>
 
         <!-- Mensajes de éxito o error -->
@@ -45,12 +45,12 @@ $centros = $centroModel->obtenerCentros();
         <?php endif; ?>
 
         <!-- Botón flotante para agregar programa -->
-        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">
+        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 z-50">
             <i class="fas fa-plus text-2xl"></i>
         </button>
 
         <!-- Modal para agregar programa -->
-        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Programa</h2>
                 <form action="../../controllers/CoordinatorController.php?action=create_program" method="POST">
@@ -87,8 +87,8 @@ $centros = $centroModel->obtenerCentros();
                             <i class="fas fa-edit"></i> Editar
                         </a>
                         <a href="../../controllers/CoordinatorController.php?action=delete_program&id=<?php echo $programa['id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('¿Estás seguro de que deseas eliminar este programa?');">
-    <i class="fas fa-trash"></i> Eliminar
-</a>
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>
