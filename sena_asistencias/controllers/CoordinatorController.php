@@ -144,21 +144,10 @@ public function eliminarAmbiente($id)
     }
 
     // Método para crear una ficha
-public function crearFicha($numero, $programa_id)
+    public function crearFicha($numero, $programa_id)
 {
     try {
-        // Validar que los campos no estén vacíos
-        if (empty($numero) || empty($programa_id)) {
-            throw new Exception("Todos los campos son requeridos.");
-        }
-
-        // Validar que el número y el programa_id sean números
-        if (!is_numeric($numero) || !is_numeric($programa_id)) {
-            throw new Exception("El número de ficha y el ID del programa deben ser números.");
-        }
-
-        // Usar el modelo FichaModel para crear la ficha
-        $fichaModel = new FichaModel();
+        $fichaModel = new FichaModel($this->db);
         if ($fichaModel->crearFicha($numero, $programa_id)) {
             $_SESSION['success'] = "Ficha creada exitosamente.";
         } else {
@@ -175,49 +164,55 @@ public function crearFicha($numero, $programa_id)
     exit();
 }
 
-// Método para editar una ficha
-public function editarFicha($id, $numero, $programa_id)
-{
-    try {
-        // Validar que los campos no estén vacíos
-        if (empty($numero) || empty($programa_id)) {
-            throw new Exception("Todos los campos son requeridos.");
+    // Obtener todas las fichas
+    public function obtenerFichas()
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT f.*, p.nombre as programa_nombre FROM fichas f JOIN programas_formacion p ON f.programa_formacion_id = p.id");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener las fichas: " . $e->getMessage());
         }
-
-        // Validar que el número y el programa_id sean números
-        if (!is_numeric($numero) || !is_numeric($programa_id)) {
-            throw new Exception("El número de ficha y el ID del programa deben ser números.");
-        }
-
-        // Usar el modelo FichaModel para editar la ficha
-        $fichaModel = new FichaModel($this->db);
-        if ($fichaModel->editarFicha($id, $numero, $programa_id)) {
-            $_SESSION['success'] = "Ficha actualizada exitosamente.";
-        } else {
-            throw new Exception("Error al actualizar la ficha.");
-        }
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
     }
 
-    // Redirigir a la página de creación de fichas
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_ficha.php");
-    exit();
-}
+    // Obtener una ficha por su ID
+    public function obtenerFichaPorId($id)
+    {
+        try {
+            $stmt = $this->db->prepare("SELECT * FROM fichas WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener la ficha: " . $e->getMessage());
+        }
+    }
 
-// Método para eliminar una ficha
-// Método para eliminar una ficha
-public function eliminarFicha($id)
+    // Editar una ficha
+    public function editarFicha($id, $numero, $programa_id)
+    {
+        try {
+            $fichaModel = new FichaModel($this->db);
+            if ($fichaModel->editarFicha($id, $numero, $programa_id)) {
+                $_SESSION['success'] = "Ficha actualizada exitosamente.";
+            } else {
+                throw new Exception("Error al actualizar la ficha.");
+            }
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+    
+        // Redirigir a la página de creación de fichas
+        header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_ficha.php");
+        exit();
+    }
+
+    // Eliminar una ficha
+    public function eliminarFicha($id)
 {
     try {
-        // Validar que el ID sea un número
-        if (!is_numeric($id)) {
-            throw new Exception("El ID de la ficha debe ser un número.");
-        }
-
-        // Usar el modelo FichaModel para eliminar la ficha
         $fichaModel = new FichaModel($this->db);
         if ($fichaModel->eliminarFicha($id)) {
             $_SESSION['success'] = "Ficha eliminada exitosamente.";
@@ -230,7 +225,7 @@ public function eliminarFicha($id)
         $_SESSION['error'] = $e->getMessage();
     }
 
-    // Redirigir a la página principal de fichas
+    // Redirigir a la página de creación de fichas
     header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_ficha.php");
     exit();
 }
@@ -367,80 +362,73 @@ public function updateProgram($id, $nombre, $centro_id)
         exit();
     }
 }
-// Crear un aprendiz
-public function crearAprendiz($nombre, $numero_identificacion, $ficha_id) {
-    try {
-        if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id)) {
-            throw new Exception("Todos los campos son requeridos.");
+    // Método para crear un aprendiz
+    public function crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id) {
+        try {
+            if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id) || empty($centro_id)) {
+                throw new Exception("Todos los campos son requeridos.");
+            }
+
+            $aprendizModel = new AprendizModel($this->db);
+            if ($aprendizModel->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id)) {
+                $_SESSION['success'] = "Aprendiz creado exitosamente.";
+            } else {
+                throw new Exception("Error al crear el aprendiz.");
+            }
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
         }
 
-        $aprendizModel = new AprendizModel($this->db);
-        if ($aprendizModel->crearAprendiz($nombre, $numero_identificacion, $ficha_id)) {
-            $_SESSION['success'] = "Aprendiz creado exitosamente.";
-        } else {
-            throw new Exception("Error al crear el aprendiz.");
-        }
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
+        header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
+        exit();
     }
 
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
-    exit();
-}
-public function editarAprendiz($id) {
-    $aprendizModel = new AprendizModel();
-    $fichaModel = new FichaModel();
+    // Método para actualizar un aprendiz
+    public function actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id, $centro_id) {
+        try {
+            if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id) || empty($centro_id)) {
+                throw new Exception("Todos los campos son requeridos.");
+            }
 
-    $aprendiz = $aprendizModel->obtenerAprendizPorId($id);
-    $fichas = $fichaModel->obtenerFichas();
-
-    // Pasar los datos a la vista
-    include __DIR__ . '/../view/coordinator/edit_aprendiz.php';
-}
-
-// Actualizar un aprendiz
-public function actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id) {
-    try {
-        if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id)) {
-            throw new Exception("Todos los campos son requeridos.");
+            $aprendizModel = new AprendizModel($this->db);
+            if ($aprendizModel->actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id, $centro_id)) {
+                $_SESSION['success'] = "Aprendiz actualizado exitosamente.";
+            } else {
+                throw new Exception("Error al actualizar el aprendiz.");
+            }
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
         }
 
-        $aprendizModel = new AprendizModel($this->db);
-        if ($aprendizModel->actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id)) {
-            $_SESSION['success'] = "Aprendiz actualizado exitosamente.";
-        } else {
-            throw new Exception("Error al actualizar el aprendiz.");
-        }
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
+        header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
+        exit();
     }
 
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
-    exit();
-}
+    // Método para eliminar un aprendiz
+    public function eliminarAprendiz($id) {
+        try {
+            $aprendizModel = new AprendizModel($this->db);
+            if ($aprendizModel->eliminarAprendiz($id)) {
+                $_SESSION['success'] = "Aprendiz eliminado exitosamente.";
+            } else {
+                throw new Exception("Error al eliminar el aprendiz.");
+            }
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+        }
+
+        header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
+        exit();
+    }
+
 
 // Eliminar un aprendiz
-public function eliminarAprendiz($id) {
-    try {
-        $aprendizModel = new AprendizModel($this->db);
-        if ($aprendizModel->eliminarAprendiz($id)) {
-            $_SESSION['success'] = "Aprendiz eliminado exitosamente.";
-        } else {
-            throw new Exception("Error al eliminar el aprendiz.");
-        }
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-    } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
-    }
-
-    header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
-    exit();
-}
 
 }
 
@@ -493,23 +481,32 @@ if (isset($_GET['action'])) {
     }
 
     // Acción para crear una ficha
+    // Acción para crear una ficha
     if ($action === 'create_ficha' && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $numero = $_POST['numero'];
         $programa_id = $_POST['programa_id'];
+
+        // Llamar al método crearFicha
         $coordinadorController->crearFicha($numero, $programa_id);
     }
 
     // Acción para editar una ficha
     if ($action === 'edit_ficha' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $id = $_GET['id'];
+        $id = $_GET['id']; // Obtener el ID de la ficha desde la URL
         $numero = $_POST['numero'];
         $programa_id = $_POST['programa_id'];
+
+        // Llamar al método editarFicha
         $coordinadorController->editarFicha($id, $numero, $programa_id);
     }
 
+
+    // Acción para eliminar una ficha
     // Acción para eliminar una ficha
     if ($action === 'delete_ficha' && isset($_GET['id'])) {
-        $id = $_GET['id'];
+        $id = $_GET['id']; // Obtener el ID de la ficha desde la URL
+
+        // Llamar al método eliminarFicha
         $coordinadorController->eliminarFicha($id);
     }
 
@@ -537,38 +534,32 @@ if (isset($_GET['action'])) {
         $id = $_GET['id'];
         $coordinadorController->eliminarInstructor($id);
     }
-    // Acción para crear un aprendiz
-    if ($action === 'create_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $nombre = $_POST['nombre'];
-        $numero_identificacion = $_POST['numero_identificacion'];
-        $ficha_id = $_POST['ficha_id'];
+        // Acción para crear un aprendiz
+        if ($action === 'create_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $nombre = $_POST['nombre'];
+            $numero_identificacion = $_POST['numero_identificacion'];
+            $ficha_id = $_POST['ficha_id'];
+            $centro_id = $_POST['centro_id']; // Obtener el centro_id del formulario
     
-        // Obtener el centro_id asociado a la ficha
-        $ficha = $fichaModel->obtenerFichaPorId($ficha_id);
-        if (!$ficha) {
-            $_SESSION['error'] = "La ficha seleccionada no existe.";
-            header("Location: create_aprendiz.php");
-            exit();
+            // Crear el aprendiz
+            $coordinadorController->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id);
         }
     
-        $centro_id = $ficha['centro_id']; // Obtener centro_id de la ficha
+        // Acción para actualizar un aprendiz
+        if ($action === 'update_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_GET['id'];
+            $nombre = $_POST['nombre'];
+            $numero_identificacion = $_POST['numero_identificacion'];
+            $ficha_id = $_POST['ficha_id'];
+            $centro_id = $_POST['centro_id']; // Obtener el centro_id del formulario
     
-        // Crear el aprendiz
-        $coordinadorController->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id);
-    }
-
-    // Acción para actualizar un aprendiz
-    if ($action === 'update_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-        $id = $_GET['id'];
-        $nombre = $_POST['nombre'];
-        $numero_identificacion = $_POST['numero_identificacion'];
-        $ficha_id = $_POST['ficha_id'];
-        $coordinadorController->actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id);
-    }
-
-    // Acción para eliminar un aprendiz
-    if ($action === 'delete_aprendiz' && isset($_GET['id'])) {
-        $id = $_GET['id'];
-        $coordinadorController->eliminarAprendiz($id);
-    }
+            // Actualizar el aprendiz
+            $coordinadorController->actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id, $centro_id);
+        }
+    
+        // Acción para eliminar un aprendiz
+        if ($action === 'delete_aprendiz' && isset($_GET['id'])) {
+            $id = $_GET['id'];
+            $coordinadorController->eliminarAprendiz($id);
+        }
 }

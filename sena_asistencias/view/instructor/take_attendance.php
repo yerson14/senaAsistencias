@@ -115,24 +115,35 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
             </tbody>
         </table>
     </div>
+
+    <!-- Contenedor para el historial de llamados a lista -->
+    <div id="historial-container" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-6xl mx-auto mt-8">
+        <h2 class="text-xl font-bold text-center mb-6">Historial de Llamados a Lista</h2>
+        <!-- Aquí se mostrará el historial -->
+    </div>
 </div>
 
 <script>
     // Objeto para almacenar la asistencia de cada aprendiz
     const asistenciaSeleccionada = {};
 
+    // Array para almacenar el historial de llamados a lista del día actual
+    let historialLlamados = [];
+
     // Función para mostrar la lista de aprendices
     function mostrarAprendices() {
         const fichaId = document.getElementById('ficha_id').value;
-        if (fichaId) {
-            cargarAprendices(fichaId);
+        const fecha = document.getElementById('fecha').value;
+
+        if (fichaId && fecha) {
+            cargarAprendices(fichaId, fecha);
         } else {
-            alert("Por favor, seleccione una ficha primero.");
+            alert("Por favor, seleccione una ficha y una fecha primero.");
         }
     }
 
-    function cargarAprendices(fichaId) {
-        if (fichaId) {
+    function cargarAprendices(fichaId, fecha) {
+        if (fichaId && fecha) {
             fetch(`../../controllers/InstructorController.php?action=get_aprendices&ficha_id=${fichaId}`)
                 .then(response => response.json())
                 .then(data => {
@@ -146,10 +157,32 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
                         // Obtener valores de los campos
                         const programa = document.getElementById('programa_formacion').selectedOptions[0].text || 'N/A';
                         const ficha = document.getElementById('ficha_id').selectedOptions[0].text || 'N/A';
-                        const fecha = document.getElementById('fecha').value || 'N/A';
                         const horaInicio = document.getElementById('hora_inicio').value || 'N/A';
                         const horaFin = document.getElementById('hora_fin').value || 'N/A';
                         const ambiente = document.getElementById('ambiente_id').selectedOptions[0].text || 'N/A';
+
+                        // Guardar el llamado a lista en el historial
+                        const llamado = {
+                            programa,
+                            ficha,
+                            fecha,
+                            horaInicio,
+                            horaFin,
+                            ambiente,
+                            aprendices: data
+                        };
+
+                        // Verificar si ya existe un llamado a lista en la misma fecha
+                        const existeLlamado = historialLlamados.some(llamado => llamado.fecha === fecha);
+
+                        if (!existeLlamado) {
+                            historialLlamados = [llamado]; // Reiniciar el historial si es un nuevo día
+                        } else {
+                            historialLlamados.push(llamado); // Agregar al historial si es el mismo día
+                        }
+
+                        // Mostrar el historial
+                        mostrarHistorial();
 
                         data.forEach(aprendiz => {
                             const tr = document.createElement('tr');
@@ -185,6 +218,56 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
         }
     }
 
+    // Función para mostrar el historial de llamados a lista
+    function mostrarHistorial() {
+        const historialContainer = document.getElementById('historial-container');
+        historialContainer.innerHTML = '';
+
+        if (historialLlamados.length > 0) {
+            historialLlamados.forEach((llamado, index) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-6xl mx-auto mb-8';
+
+                div.innerHTML = `
+                    <h2 class="text-xl font-bold text-center mb-6">Llamado a lista #${index + 1}</h2>
+                    <table class="w-full border-collapse border border-gray-300 text-sm">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border border-gray-300 p-2">Nombre</th>
+                                <th class="border border-gray-300 p-2">Programa de Formación</th>
+                                <th class="border border-gray-300 p-2">Ficha</th>
+                                <th class="border border-gray-300 p-2">Fecha</th>
+                                <th class="border border-gray-300 p-2">Hora Inicio</th>
+                                <th class="border border-gray-300 p-2">Hora Fin</th>
+                                <th class="border border-gray-300 p-2">Ambiente</th>
+                                <th class="border border-gray-300 p-2">Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${llamado.aprendices.map(aprendiz => `
+                                <tr>
+                                    <td class="border border-gray-300 p-2 text-center">${aprendiz.nombre}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.programa}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.ficha}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.fecha}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.horaInicio}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.horaFin}</td>
+                                    <td class="border border-gray-300 p-2 text-center">${llamado.ambiente}</td>
+                                    <td class="border border-gray-300 p-2 text-center">
+                                        ${asistenciaSeleccionada[aprendiz.id] || 'Sin registrar'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+
+                historialContainer.appendChild(div);
+            });
+        }
+    }
+
+    // Función para marcar la asistencia de un aprendiz
     function marcarAsistencia(aprendizId, estado) {
         // Almacenar la selección en el objeto
         asistenciaSeleccionada[aprendizId] = estado;

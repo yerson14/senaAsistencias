@@ -90,8 +90,8 @@ $fichas = $fichaModel->obtenerFichas();
                             <i class="fas fa-edit"></i> Editar
                         </a>
                         <a href="../../controllers/CoordinatorController.php?action=delete_ficha&id=<?php echo $ficha['id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('¿Estás seguro de que deseas eliminar esta ficha?');">
-    <i class="fas fa-trash"></i> Eliminar
-</a>
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>

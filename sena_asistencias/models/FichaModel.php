@@ -6,21 +6,33 @@ class FichaModel
     private $db;
 
     public function __construct($db)
-    {
-        $this->db = $db;
-    }
+{
+    $this->db = $db;
+}
 
     // Crear una ficha
     public function crearFicha($numero, $programa_id)
     {
         try {
+            // Validar que los campos no estén vacíos
+            if (empty($numero) || empty($programa_id)) {
+                throw new Exception("El número de ficha y el ID del programa son requeridos.");
+            }
+    
+            // Validar que el programa_id sea un número
+            if (!is_numeric($programa_id)) {
+                throw new Exception("El ID del programa debe ser un número.");
+            }
+    
+            // Insertar la ficha
             $stmt = $this->db->prepare("INSERT INTO fichas (codigo, programa_formacion_id) VALUES (?, ?)");
             return $stmt->execute([$numero, $programa_id]);
         } catch (PDOException $e) {
-            throw new Exception("Error al crear la ficha: " . $e->getMessage());
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
         }
     }
-
     // Obtener todas las fichas
     public function obtenerFichas()
     {
@@ -34,8 +46,7 @@ class FichaModel
     }
 
     // Obtener una ficha por su ID
-    public function obtenerFichaPorId($id)
-    {
+    public function obtenerFichaPorId($id) {
         try {
             $stmt = $this->db->prepare("SELECT * FROM fichas WHERE id = ?");
             $stmt->execute([$id]);

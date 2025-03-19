@@ -9,21 +9,22 @@ require_once '../../config/Database.php';
 require_once '../../models/ProgramaFormacionModel.php';
 require_once '../../models/FichaModel.php';
 
-// Obtener la conexión a la base de datos
-$db = Database::getInstance()->getConnection();
-
-// Crear instancias de los modelos
-$programaFormacionModel = new ProgramaFormacionModel($db);
-$fichaModel = new FichaModel($db);
-
 // Obtener el ID de la ficha desde la URL
 $id = $_GET['id'];
 
+// Obtener los programas de formación desde la base de datos
+$programaFormacionModel = new ProgramaFormacionModel(Database::getInstance()->getConnection());
+$programas = $programaFormacionModel->obtenerProgramas();
+
 // Obtener la ficha por su ID
+$fichaModel = new FichaModel(Database::getInstance()->getConnection());
 $ficha = $fichaModel->obtenerFichaPorId($id);
 
-// Obtener los programas de formación
-$programas = $programaFormacionModel->obtenerProgramas();
+if (!$ficha) {
+    $_SESSION['error'] = "La ficha no existe.";
+    header("Location: create_ficha.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -56,25 +57,25 @@ $programas = $programaFormacionModel->obtenerProgramas();
             </div>
         <?php endif; ?>
 
-        <!-- Formulario para editar una ficha -->
+        <!-- Formulario para editar ficha -->
         <form action="../../controllers/CoordinatorController.php?action=edit_ficha&id=<?php echo $id; ?>" method="POST">
             <div class="mb-4">
                 <label for="numero" class="block text-sm font-medium text-gray-700">Número de Ficha</label>
-                <input type="text" name="numero" id="numero" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" value="<?php echo $ficha['codigo']; ?>" required>
+                <input type="text" name="numero" id="numero" value="<?php echo $ficha['codigo']; ?>" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
             </div>
             <div class="mb-4">
                 <label for="programa_id" class="block text-sm font-medium text-gray-700">Programa</label>
                 <select name="programa_id" id="programa_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     <option value="">Seleccione un Programa</option>
                     <?php foreach ($programas as $programa): ?>
-                        <option value="<?php echo $programa['id']; ?>" <?php echo $programa['id'] == $ficha['programa_formacion_id'] ? 'selected' : ''; ?>>
+                        <option value="<?php echo $programa['id']; ?>" <?php echo ($programa['id'] == $ficha['programa_formacion_id']) ? 'selected' : ''; ?>>
                             <?php echo $programa['nombre']; ?>
                         </option>
                     <?php endforeach; ?>
                 </select>
             </div>
             <div class="flex justify-end">
-                <button type="button" onclick="window.location.href='create_ficha.php'" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>
+                <button type="button" onclick="window.history.back()" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Guardar Cambios</button>
             </div>
         </form>

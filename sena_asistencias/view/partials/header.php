@@ -10,7 +10,7 @@
         <img src="../../assets/images/logoSena.png" alt="Logo SENA" class="h-8 w-8"> <!-- Cambia la ruta a la de tu logo -->
         
         <!-- Ícono de perfil -->
-        <a href="ruta/a/perfil" class="text-white hover:text-gray-200">
+        <a href="" class="text-white hover:text-gray-200">
             <i class="fas fa-user-circle text-2xl"></i> <!-- Ícono de perfil -->
         </a>
 
