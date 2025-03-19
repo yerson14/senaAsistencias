@@ -34,31 +34,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])
                 $stmt = $db->prepare("INSERT INTO asistencias (aprendiz_id, ficha_id, programa_id, ambiente_id, fecha, hora_inicio, hora_fin, estado) 
                                      VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$aprendizId, $fichaId, $programaId, $ambienteId, $fecha, $horaInicio, $horaFin, $estado]);
-            }
-             // Verificar si el estado es "ausente"
-             if ($estado === 'ausente') {
-                // Contar las ausencias del aprendiz
-                $stmtCount = $db->prepare("SELECT COUNT(*) as total_ausentes FROM asistencias WHERE aprendiz_id = ? AND estado = 'ausente'");
-                $stmtCount->execute([$aprendizId]);
-                $result = $stmtCount->fetch(PDO::FETCH_ASSOC);
-                $totalAusentes = $result['total_ausentes'];
 
-                // Si tiene 3 o más ausencias, redirigir a la vista de reportes
-                if ($totalAusentes >= 3) {
-                    // Guardar el ID del aprendiz en la sesión para usarlo en la vista de reportes
-                    session_start();
-                    $_SESSION['aprendiz_id'] = $aprendizId;
+                // Verificar si el estado es "ausente"
+                if ($estado === 'ausente') {
+                    // Contar las ausencias del aprendiz
+                    $stmtCount = $db->prepare("SELECT COUNT(*) as total_ausentes FROM asistencias WHERE aprendiz_id = ? AND estado = 'ausente'");
+                    $stmtCount->execute([$aprendizId]);
+                    $result = $stmtCount->fetch(PDO::FETCH_ASSOC);
+                    $totalAusentes = $result['total_ausentes'];
 
-                    // Redirigir a la vista de reportes
-                    header('Location: take_attandance.php');
-                    exit;
+                    // Si tiene 3 o más ausencias, guardar el ID del aprendiz en la sesión
+                    if ($totalAusentes >= 3) {
+                        session_start();
+                        $_SESSION['aprendiz_id'] = $aprendizId;
+                    }
                 }
             }
+            
             // Confirmar la transacción
             $db->commit();
             $mensaje = '<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4" role="alert">
                          <strong>¡Éxito!</strong> Asistencia guardada correctamente.
                        </div>';
+
+            // Redirigir a la vista de reportes si hay un aprendiz con 3 o más ausencias
+            if (isset($_SESSION['aprendiz_id'])) {
+                header('Location: view_reports.php');
+                exit;
+            }
         } catch (Exception $e) {
             // Revertir en caso de error
             $db->rollBack();
