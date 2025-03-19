@@ -82,6 +82,47 @@ function obtenerAprendicesPorFicha($db, $fichaId) {
     $stmt->execute([$fichaId]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// Función para obtener las asistencias filtradas
+function obtenerAsistenciasFiltradas($db, $fecha, $fichaId, $programaId) {
+    $sql = "SELECT a.id, a.fecha, a.hora_inicio, a.hora_fin, a.estado, ap.nombre AS aprendiz, f.codigo AS ficha, p.nombre AS programa 
+            FROM asistencias a
+            JOIN aprendices ap ON a.aprendiz_id = ap.id
+            JOIN fichas f ON a.ficha_id = f.id
+            JOIN programas_formacion p ON a.programa_id = p.id
+            WHERE 1=1";
+    
+    $params = [];
+    
+    if (!empty($fecha)) {
+        $sql .= " AND a.fecha = ?";
+        $params[] = $fecha;
+    }
+    
+    if (!empty($fichaId)) {
+        $sql .= " AND a.ficha_id = ?";
+        $params[] = $fichaId;
+    }
+    
+    if (!empty($programaId)) {
+        $sql .= " AND a.programa_id = ?";
+        $params[] = $programaId;
+    }
+    
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Obtener asistencias filtradas si se ha enviado el formulario de búsqueda
+$asistenciasFiltradas = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['buscar_asistencias'])) {
+    $fechaBusqueda = $_POST['fecha_busqueda'];
+    $fichaBusqueda = $_POST['ficha_busqueda'];
+    $programaBusqueda = $_POST['programa_busqueda'];
+    
+    $asistenciasFiltradas = obtenerAsistenciasFiltradas($db, $fechaBusqueda, $fichaBusqueda, $programaBusqueda);
+}
 ?>
 
 <!-- Estilos y scripts -->
@@ -201,6 +242,84 @@ function obtenerAprendicesPorFicha($db, $fichaId) {
             </div>
         </form>
     </div>
+
+    <!-- Caja de búsqueda de asistencias -->
+    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-full mx-auto mb-8">
+        <h2 class="text-xl font-bold text-center mb-6">Buscar Asistencias</h2>
+        
+        <form method="POST" class="space-y-4">
+            <div class="grid grid-cols-3 gap-4">
+                <!-- Fecha de búsqueda -->
+                <div>
+                    <label for="fecha_busqueda" class="block text-sm font-medium text-gray-700">Fecha</label>
+                    <input type="date" name="fecha_busqueda" id="fecha_busqueda" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+
+                <!-- Ficha de búsqueda -->
+                <div>
+                    <label for="ficha_busqueda" class="block text-sm font-medium text-gray-700">Ficha</label>
+                    <select name="ficha_busqueda" id="ficha_busqueda" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Seleccione</option>
+                        <?php foreach ($fichas as $ficha): ?>
+                            <option value="<?php echo $ficha['id']; ?>"><?php echo $ficha['codigo']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Programa de búsqueda -->
+                <div>
+                    <label for="programa_busqueda" class="block text-sm font-medium text-gray-700">Programa</label>
+                    <select name="programa_busqueda" id="programa_busqueda" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Seleccione</option>
+                        <?php foreach ($programas as $programa): ?>
+                            <option value="<?php echo $programa['id']; ?>"><?php echo $programa['nombre']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Botón de búsqueda -->
+            <div class="text-center">
+                <button type="submit" name="buscar_asistencias" class="px-6 py-2 bg-blue-500 text-white font-bold rounded-md hover:bg-blue-600">
+                    <i class="fas fa-search mr-2"></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Mostrar resultados de la búsqueda -->
+    <?php if (!empty($asistenciasFiltradas)): ?>
+        <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-full mx-auto mb-8">
+            <h2 class="text-xl font-bold text-center mb-6">Resultados de la Búsqueda</h2>
+            
+            <table class="w-full border-collapse border border-gray-300 text-sm">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border border-gray-300 p-2">Aprendiz</th>
+                        <th class="border border-gray-300 p-2">Programa</th>
+                        <th class="border border-gray-300 p-2">Ficha</th>
+                        <th class="border border-gray-300 p-2">Fecha</th>
+                        <th class="border border-gray-300 p-2">Hora Inicio</th>
+                        <th class="border border-gray-300 p-2">Hora Fin</th>
+                        <th class="border border-gray-300 p-2">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($asistenciasFiltradas as $asistencia): ?>
+                        <tr>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['aprendiz']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['programa']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['ficha']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['fecha']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['hora_inicio']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['hora_fin']; ?></td>
+                            <td class="border border-gray-300 p-2 text-center"><?php echo $asistencia['estado']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
 </div>
 
 <script>
