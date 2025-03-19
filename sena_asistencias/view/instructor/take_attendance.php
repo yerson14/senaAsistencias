@@ -25,82 +25,112 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
 <div class="ml-64 p-8">
     <h1 class="text-3xl font-bold mb-6 text-center">Tomar Asistencia</h1>
 
-    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-md mx-auto">
-        <form action="../../controllers/InstructorController.php?action=take_attendance" method="POST" class="space-y-4">
+    <!-- Caja principal del formulario -->
+    <div class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-full mx-auto mb-8">
+        <form action="../../controllers/InstructorController.php?action=take_attendance" method="POST" class="space-y-4" id="form-asistencia">
+            <div class="grid grid-cols-7 gap-4">
+                <!-- Programa de Formación -->
+                <div>
+                    <label for="programa_formacion" class="block text-sm font-medium text-gray-700">Programa</label>
+                    <select name="programa_formacion" id="programa_formacion" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Seleccione</option>
+                        <?php foreach ($programas as $programa): ?>
+                            <option value="<?php echo $programa['id']; ?>"><?php echo $programa['nombre']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-            <!-- Programa de Formación -->
-            <div>
-                <label for="programa_formacion" class="block text-sm font-medium text-gray-700 text-center">Programa de Formación</label>
-                <select name="programa_formacion" id="programa_formacion" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
-                    <option value="">Seleccione un programa</option>
-                    <?php foreach ($programas as $programa): ?>
-                        <option value="<?php echo $programa['id']; ?>"><?php echo $programa['nombre']; ?></option>
-                    <?php endforeach; ?>
-                </select>
+                <!-- Ficha -->
+                <div>
+                    <label for="ficha_id" class="block text-sm font-medium text-gray-700">Ficha</label>
+                    <select name="ficha_id" id="ficha_id" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Seleccione</option>
+                        <?php foreach ($fichas as $ficha): ?>
+                            <option value="<?php echo $ficha['id']; ?>"><?php echo $ficha['codigo']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Ambiente -->
+                <div>
+                    <label for="ambiente_id" class="block text-sm font-medium text-gray-700">Ambiente</label>
+                    <select name="ambiente_id" id="ambiente_id" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Seleccione</option>
+                        <?php foreach ($ambientes as $ambiente): ?>
+                            <option value="<?php echo $ambiente['id']; ?>"><?php echo $ambiente['nombre']; ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <!-- Fecha -->
+                <div>
+                    <label for="fecha" class="block text-sm font-medium text-gray-700">Fecha</label>
+                    <input type="date" name="fecha" id="fecha" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Hora de Inicio -->
+                <div>
+                    <label for="hora_inicio" class="block text-sm font-medium text-gray-700">Hora Inicio</label>
+                    <input type="time" name="hora_inicio" id="hora_inicio" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Hora de Fin -->
+                <div>
+                    <label for="hora_fin" class="block text-sm font-medium text-gray-700">Hora Fin</label>
+                    <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Botón de guardar asistencia (ícono de chulo) -->
+                <div class="flex items-end">
+                    <button type="button" onclick="mostrarAprendices()" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+                        <i class="fas fa-check"></i> <!-- Ícono de chulo -->
+                    </button>
+                </div>
             </div>
 
-            <!-- Ficha -->
-            <div>
-                <label for="ficha_id" class="block text-sm font-medium text-gray-700 text-center">Ficha</label>
-                <select name="ficha_id" id="ficha_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required onchange="cargarAprendices(this.value)">
-                    <option value="">Seleccione una ficha</option>
-                    <?php foreach ($fichas as $ficha): ?>
-                        <option value="<?php echo $ficha['id']; ?>"><?php echo $ficha['codigo']; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <!-- Ambiente -->
-            <div>
-                <label for="ambiente_id" class="block text-sm font-medium text-gray-700 text-center">Ambiente</label>
-                <select name="ambiente_id" id="ambiente_id" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
-                    <option value="">Seleccione un ambiente</option>
-                    <?php foreach ($ambientes as $ambiente): ?>
-                        <option value="<?php echo $ambiente['id']; ?>"><?php echo $ambiente['nombre']; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div>
-                <label for="fecha" class="block text-sm font-medium text-gray-700 text-center">Fecha</label>
-                <input type="date" name="fecha" id="fecha" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
-            </div>
-
-            <div>
-                <label for="hora_inicio" class="block text-sm font-medium text-gray-700 text-center">Hora de Inicio</label>
-                <input type="time" name="hora_inicio" id="hora_inicio" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
-            </div>
-
-            <div>
-                <label for="hora_fin" class="block text-sm font-medium text-gray-700 text-center">Hora de Fin</label>
-                <input type="time" name="hora_fin" id="hora_fin" class="mt-1 block w-full max-w-xs px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 mx-auto" required>
-            </div>
-
-
+            <!-- Campo oculto para enviar la asistencia -->
+            <input type="hidden" name="asistencia" id="asistencia-data">
         </form>
     </div>
-</div>
-<!-- Caja adicional para mostrar estudiantes y asistencia -->
-<div id="asistencia-container" class="bg-gray-100 p-4 rounded-lg shadow-md border border-gray-300 hidden mt-4">
-    <h2 class="text-xl font-bold text-center mb-3">Lista de Aprendices</h2>
 
-    <table class="w-full border-collapse border border-gray-300 text-sm">
-        <thead>
-            <tr class="bg-gray-200">
-                <th class="border border-gray-300 p-2">Nombre</th>
-                <th class="border border-gray-300 p-2">Fecha Inicio</th>
-                <th class="border border-gray-300 p-2">Hora Inicio</th>
-                <th class="border border-gray-300 p-2">Fecha Fin</th>
-                <th class="border border-gray-300 p-2">Ambiente</th>
-                <th class="border border-gray-300 p-2">Asistencia</th>
-            </tr>
-        </thead>
-        <tbody id="lista-aprendices">
-            <!-- Se llenará con JavaScript -->
-        </tbody>
-    </table>
+    <!-- Caja de la lista de aprendices -->
+    <div id="asistencia-container" class="bg-white p-6 rounded-lg shadow-md border border-gray-200 max-w-6xl mx-auto hidden">
+        <h2 class="text-xl font-bold text-center mb-6">Lista de Aprendices</h2>
+
+        <table class="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="border border-gray-300 p-2">Nombre</th>
+                    <th class="border border-gray-300 p-2">Programa de Formación</th>
+                    <th class="border border-gray-300 p-2">Ficha</th>
+                    <th class="border border-gray-300 p-2">Fecha</th>
+                    <th class="border border-gray-300 p-2">Hora Inicio</th>
+                    <th class="border border-gray-300 p-2">Hora Fin</th>
+                    <th class="border border-gray-300 p-2">Ambiente</th>
+                    <th class="border border-gray-300 p-2">Asistencia</th>
+                </tr>
+            </thead>
+            <tbody id="lista-aprendices">
+                <!-- Se llenará con JavaScript -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
+    // Objeto para almacenar la asistencia de cada aprendiz
+    const asistenciaSeleccionada = {};
+
+    // Función para mostrar la lista de aprendices
+    function mostrarAprendices() {
+        const fichaId = document.getElementById('ficha_id').value;
+        if (fichaId) {
+            cargarAprendices(fichaId);
+        } else {
+            alert("Por favor, seleccione una ficha primero.");
+        }
+    }
+
     function cargarAprendices(fichaId) {
         if (fichaId) {
             fetch(`../../controllers/InstructorController.php?action=get_aprendices&ficha_id=${fichaId}`)
@@ -113,23 +143,33 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
                     if (data.length > 0) {
                         asistenciaContainer.classList.remove('hidden');
 
+                        // Obtener valores de los campos
+                        const programa = document.getElementById('programa_formacion').selectedOptions[0].text || 'N/A';
+                        const ficha = document.getElementById('ficha_id').selectedOptions[0].text || 'N/A';
+                        const fecha = document.getElementById('fecha').value || 'N/A';
+                        const horaInicio = document.getElementById('hora_inicio').value || 'N/A';
+                        const horaFin = document.getElementById('hora_fin').value || 'N/A';
+                        const ambiente = document.getElementById('ambiente_id').selectedOptions[0].text || 'N/A';
+
                         data.forEach(aprendiz => {
                             const tr = document.createElement('tr');
 
                             tr.innerHTML = `
-                            <td class="border border-gray-300 p-2 text-center">${aprendiz.nombre}</td>
-                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('fecha').value || 'N/A'}</td>
-                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('hora_inicio').value || 'N/A'}</td>
-                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('hora_fin').value || 'N/A'}</td>
-                            <td class="border border-gray-300 p-2 text-center">${document.getElementById('ambiente_id').selectedOptions[0].text}</td>
-                            <td class="border border-gray-300 p-2 text-center">
-                                <select name="asistencia[${aprendiz.id}]" class="px-2 py-1 border rounded-md">
-                                    <option value="presente">Presente</option>
-                                    <option value="ausente">Ausente</option>
-                                    <option value="excusa">Excusa</option>
-                                </select>
-                            </td>
-                        `;
+                                <td class="border border-gray-300 p-2 text-center">${aprendiz.nombre}</td>
+                                <td class="border border-gray-300 p-2 text-center">${programa}</td>
+                                <td class="border border-gray-300 p-2 text-center">${ficha}</td>
+                                <td class="border border-gray-300 p-2 text-center">${fecha}</td>
+                                <td class="border border-gray-300 p-2 text-center">${horaInicio}</td>
+                                <td class="border border-gray-300 p-2 text-center">${horaFin}</td>
+                                <td class="border border-gray-300 p-2 text-center">${ambiente}</td>
+                                <td class="border border-gray-300 p-2 text-center">
+                                    <div class="flex space-x-2">
+                                        <button type="button" data-aprendiz-id="${aprendiz.id}" data-estado="presente" onclick="marcarAsistencia(${aprendiz.id}, 'presente')" class="px-3 py-1 bg-gray-300 text-white rounded-md hover:bg-gray-400">Presente</button>
+                                        <button type="button" data-aprendiz-id="${aprendiz.id}" data-estado="ausente" onclick="marcarAsistencia(${aprendiz.id}, 'ausente')" class="px-3 py-1 bg-gray-300 text-white rounded-md hover:bg-gray-400">Ausente</button>
+                                        <button type="button" data-aprendiz-id="${aprendiz.id}" data-estado="excusa" onclick="marcarAsistencia(${aprendiz.id}, 'excusa')" class="px-3 py-1 bg-gray-300 text-white rounded-md hover:bg-gray-400">Excusa</button>
+                                    </div>
+                                </td>
+                            `;
 
                             listaAprendices.appendChild(tr);
                         });
@@ -145,24 +185,42 @@ $ambientes = $db->query("SELECT id, nombre FROM ambientes")->fetchAll(PDO::FETCH
         }
     }
 
-    function actualizarDatosAsistencia() {
-        let fecha = document.getElementById('fecha').value;
-        let horaInicio = document.getElementById('hora_inicio').value;
-        let horaFin = document.getElementById('hora_fin').value;
-        let ambiente = document.getElementById('ambiente_id').selectedOptions[0].text;
+    function marcarAsistencia(aprendizId, estado) {
+        // Almacenar la selección en el objeto
+        asistenciaSeleccionada[aprendizId] = estado;
 
-        document.getElementById('asistencia-fecha').innerText = fecha || 'N/A';
-        document.getElementById('asistencia-hora-inicio').innerText = horaInicio || 'N/A';
-        document.getElementById('asistencia-hora-fin').innerText = horaFin || 'N/A';
-        document.getElementById('asistencia-ambiente').innerText = ambiente || 'N/A';
+        // Cambiar el estilo del botón seleccionado
+        const botones = document.querySelectorAll(`button[data-aprendiz-id="${aprendizId}"]`);
+        botones.forEach(boton => {
+            boton.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'hover:bg-green-600', 'hover:bg-red-600', 'hover:bg-yellow-600');
+            boton.classList.add('bg-gray-300', 'hover:bg-gray-400');
+        });
+
+        // Resaltar el botón seleccionado
+        const botonSeleccionado = document.querySelector(`button[data-aprendiz-id="${aprendizId}"][data-estado="${estado}"]`);
+        if (botonSeleccionado) {
+            if (estado === 'presente') {
+                botonSeleccionado.classList.remove('bg-gray-300', 'hover:bg-gray-400');
+                botonSeleccionado.classList.add('bg-green-500', 'hover:bg-green-600');
+            } else if (estado === 'ausente') {
+                botonSeleccionado.classList.remove('bg-gray-300', 'hover:bg-gray-400');
+                botonSeleccionado.classList.add('bg-red-500', 'hover:bg-red-600');
+            } else if (estado === 'excusa') {
+                botonSeleccionado.classList.remove('bg-gray-300', 'hover:bg-gray-400');
+                botonSeleccionado.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            }
+        }
+
+        console.log(`Asistencia del aprendiz ${aprendizId}: ${estado}`);
     }
 
-    // Llamar la función cada vez que se actualicen los campos
-    document.getElementById('fecha').addEventListener('change', actualizarDatosAsistencia);
-    document.getElementById('hora_inicio').addEventListener('change', actualizarDatosAsistencia);
-    document.getElementById('hora_fin').addEventListener('change', actualizarDatosAsistencia);
-    document.getElementById('ambiente_id').addEventListener('change', actualizarDatosAsistencia);
+    // Enviar la asistencia seleccionada al formulario
+    document.getElementById('form-asistencia').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const asistenciaData = document.getElementById('asistencia-data');
+        asistenciaData.value = JSON.stringify(asistenciaSeleccionada);
+        this.submit();
+    });
 </script>
-
 
 <?php include '../partials/footer.php'; ?>
