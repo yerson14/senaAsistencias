@@ -26,4 +26,25 @@ class InstructorController {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
+
+
+if ($_GET['action'] == 'get_estudiantes' && isset($_GET['ficha_id'])) {
+    $fichaId = $_GET['ficha_id'];
+    
+    // Aquí debes realizar la consulta a la base de datos para obtener los estudiantes de la ficha seleccionada
+    // Por ejemplo:
+    // $estudiantes = $db->query("SELECT nombre, apellido FROM estudiantes WHERE ficha_id = $fichaId")->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Simulación de datos (reemplaza esto con la consulta real a la base de datos)
+    $estudiantes = [
+        ['nombre' => 'Juan', 'apellido' => 'Pérez'],
+        ['nombre' => 'Ana', 'apellido' => 'Gómez'],
+        // Agrega más estudiantes según la ficha seleccionada
+    ];
+
+    // Devuelve los datos en formato JSON
+    header('Content-Type: application/json');
+    echo json_encode($estudiantes);
+    exit;
+}
 ?>
