@@ -1,6 +1,6 @@
 <?php
 // Incluir la conexión a la base de datos
-require_once '../../config/Database.php';
+require_once '../../config/database.php';
 
 // Obtener la conexión
 $db = Database::getInstance()->getConnection();

@@ -1,6 +1,6 @@
 <?php
 // Incluir la conexión a la base de datos
-require_once '../../config/Database.php'; // Asegúrate de que esta ruta es correcta
+require_once '../../config/database.php'; // Asegúrate de que esta ruta es correcta
 
 // Obtener la conexión
 $db = Database::getInstance()->getConnection();
@@ -237,7 +237,7 @@ function obtenerAprendicesPorFicha($db, $fichaId) {
         const ambiente = document.getElementById('ambiente_id').selectedOptions[0].text || 'N/A';
         
         // Realizar la solicitud AJAX para obtener los aprendices
-        fetch(obtener_aprendices.php?ficha_id=${fichaId}) // Ajustar esta URL según corresponda
+        fetch(`obtener_aprendices.php?ficha_id=${fichaId}`) // Ajustar esta URL según corresponda
             .then(response => response.json())
             .then(data => {
                 toggleElement('loading-message', false);
@@ -308,7 +308,7 @@ function obtenerAprendicesPorFicha($db, $fichaId) {
         document.getElementById('asistencia-data').value = JSON.stringify(asistenciaSeleccionada);
         
         // Cambiar el estilo de los botones para ese aprendiz
-        const botones = document.querySelectorAll(button[data-aprendiz-id="${aprendizId}"]);
+        const botones = document.querySelectorAll(`button[data-aprendiz-id="${aprendizId}"]`);
         botones.forEach(boton => {
             // Restablecer todos los botones a gris
             boton.classList.remove('bg-green-500', 'bg-red-500', 'bg-yellow-500', 'hover:bg-green-600', 'hover:bg-red-600', 'hover:bg-yellow-600');
@@ -316,7 +316,7 @@ function obtenerAprendicesPorFicha($db, $fichaId) {
         });
         
         // Resaltar el botón seleccionado con el color correspondiente
-        const botonSeleccionado = document.querySelector(button[data-aprendiz-id="${aprendizId}"][data-estado="${estado}"]);
+        const botonSeleccionado = document.querySelector(`button[data-aprendiz-id="${aprendizId}"][data-estado="${estado}"]`);
         if (botonSeleccionado) {
             botonSeleccionado.classList.remove('bg-gray-300', 'hover:bg-gray-400');
             
