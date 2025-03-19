@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['guardar_asistencia'])
                     $_SESSION['aprendiz_id'] = $aprendizId;
 
                     // Redirigir a la vista de reportes
-                    header('Location: view_reports.php');
+                    header('Location: take_attandance.php');
                     exit;
                 }
             }
