@@ -32,21 +32,30 @@ class CentroModel {
     }
 
     // Obtener centros por regional
-    public function obtenerCentrosPorRegional($regional_id) {
+    public function obtenerRegionales() {
         try {
-            // Preparar la consulta SQL
-            $stmt = $this->db->prepare("SELECT * FROM centros WHERE regional_id = ?");
-            $stmt->execute([$regional_id]);
-
-            // Verificar si se obtuvieron resultados
-            if ($stmt) {
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                throw new Exception("Error al obtener los centros.");
-            }
+            $stmt = $this->db->query("SELECT id, nombre FROM regionales ORDER BY nombre");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            // Capturar errores de la base de datos
-            throw new Exception("Error de base de datos: " . $e->getMessage());
+            error_log("Error en obtenerRegionales: " . $e->getMessage());
+            return [];
+        }
+    }
+    
+    public function obtenerRegionalConCentros($regional_id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT r.id as regional_id, r.nombre as regional_nombre, 
+                       c.id as centro_id, c.nombre as centro_nombre 
+                FROM regionales r
+                LEFT JOIN centros c ON r.id = c.regional_id
+                WHERE r.id = ?
+            ");
+            $stmt->execute([$regional_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error en obtenerRegionalConCentros: " . $e->getMessage());
+            return [];
         }
     }
 
@@ -121,6 +130,16 @@ class CentroModel {
         } catch (PDOException $e) {
             // Capturar errores de la base de datos
             throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
+    }
+    public function obtenerCentrosPorRegional($regional_id) {
+        try {
+            $stmt = $this->db->prepare("SELECT id, nombre FROM centros WHERE regional_id = ?");
+            $stmt->execute([$regional_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al obtener centros por regional: " . $e->getMessage());
+            return false;
         }
     }
 }

@@ -56,5 +56,21 @@ public function editarCoordinador($id, $nombre, $correo, $numero_identificacion,
         throw new Exception("Error de base de datos: " . $e->getMessage());
     }
 }
+public function obtenerCoordinadorPorId($id) {
+    try {
+        $stmt = $this->db->prepare("
+            SELECT u.*, c.centro_id, cen.nombre AS centro_nombre, cen.regional_id
+            FROM usuarios u
+            JOIN coordinadores co ON u.id = co.usuario_id
+            JOIN centros cen ON co.centro_id = cen.id
+            WHERE u.id = ? AND u.rol = 'coordinador'
+        ");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error en obtenerCoordinadorPorId: " . $e->getMessage());
+        return false;
+    }
+}
 }
 ?>

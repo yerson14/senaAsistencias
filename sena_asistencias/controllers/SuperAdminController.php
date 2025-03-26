@@ -259,6 +259,26 @@ class SuperAdminController
         header("Location: ../view/superadmin/create_coordinador.php");
         exit();
     }
+    public function obtenerCentrosPorRegional($regional_id) {
+        try {
+            $centroModel = new CentroModel();
+            $centros = $centroModel->obtenerCentrosPorRegional($regional_id);
+            
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'centros' => $centros
+            ]);
+            exit;
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
+            exit;
+        }
+    }
 }
 
 // Manejar las acciones del controlador
@@ -319,5 +339,10 @@ if (isset($_GET['action'])) {
     if ($action === 'delete_coordinador' && isset($_GET['id'])) {
         $id = $_GET['id'];
         $superAdminController->delete_coordinador($id);
+    }
+    // Y agregar este caso al manejo de acciones
+    if ($action === 'obtener_centros_por_regional' && isset($_GET['regional_id'])) {
+        $regional_id = $_GET['regional_id'];
+        $superAdminController->obtenerCentrosPorRegional($regional_id);
     }
 }

@@ -3,6 +3,7 @@ session_start();
 require_once __DIR__ . '/../../config/Database.php';
 require_once __DIR__ . '/../../models/CentroModel.php';
 require_once __DIR__ . '/../../models/UsuarioModel.php';
+require_once __DIR__ . '/../../models/RegionalModel.php';
 
 // Verificar si el usuario es superadmin
 if ($_SESSION['usuario']['rol'] !== 'superadmin') {
@@ -10,15 +11,17 @@ if ($_SESSION['usuario']['rol'] !== 'superadmin') {
     exit;
 }
 
+// Inicializar modelos
 $centroModel = new CentroModel();
 $coordinadorModel = new UsuarioModel();
+$regionalModel = new RegionalModel();
 
-// Obtener los centros disponibles
+// Obtener datos necesarios
 $centros = $centroModel->obtenerCentros();
-
-// Obtener la lista de coordinadores
 $coordinadores = $coordinadorModel->obtenerCoordinadores();
+$regionales = $regionalModel->obtenerRegionales();
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 
@@ -28,13 +31,31 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
     <title>Gestión de Coordinadores</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .modal-container {
+            z-index: 1000;
+        }
+        .main-content {
+            min-height: calc(100vh - 120px);
+        }
+        select:disabled {
+            background-color: #f3f4f6;
+            cursor: not-allowed;
+        }
+        #centro-container {
+            transition: all 0.3s ease;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 
-<body class="bg-gray-100">
+<body class="bg-gray-100 flex flex-col min-h-screen">
     <?php include '../partials/header.php'; ?>
     <?php include '../partials/sidebar.php'; ?>
 
-    <div class="ml-64 p-8">
+    <div class="ml-64 p-8 flex-grow main-content">
         <h1 class="text-3xl font-bold mb-6">Gestión de Coordinadores</h1>
 
         <!-- Mensajes de éxito o error -->
@@ -52,39 +73,81 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
         <?php endif; ?>
 
         <!-- Botón flotante para agregar coordinador -->
-        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 z-50">
+        <button onclick="openModal()" class="fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 z-40">
             <i class="fas fa-plus text-2xl"></i>
         </button>
 
         <!-- Modal para agregar coordinador -->
-        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 modal-container">
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Coordinador</h2>
-                <form action="../../controllers/SuperAdminController.php?action=crear_coordinador" method="POST">
+                <form id="formCoordinador" action="../../controllers/SuperAdminController.php?action=crear_coordinador" method="POST">
+                    <!-- Campo Nombre -->
                     <div class="mb-4">
-                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
-                        <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+                        <input type="text" name="nombre" id="nombre" 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                               required>
                     </div>
+                    
+                    <!-- Campo Correo -->
                     <div class="mb-4">
-                        <label for="correo" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                        <input type="email" name="correo" id="correo" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        <label for="correo" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                        <input type="email" name="correo" id="correo" 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                               required>
                     </div>
+                    
+                    <!-- Campo Identificación -->
                     <div class="mb-4">
-                        <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de Identificación</label>
-                        <input type="text" name="numero_identificacion" id="numero_identificacion" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de identificación</label>
+                        <input type="text" name="numero_identificacion" id="numero_identificacion" 
+                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                               required>
                     </div>
+                    
+                    <!-- Selector de Regional -->
                     <div class="mb-4">
-                        <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro</label>
-                        <select name="centro_id" id="centro_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">Seleccione un centro</option>
-                            <?php foreach ($centros as $centro): ?>
-                                <option value="<?php echo $centro['id']; ?>"><?php echo $centro['nombre']; ?></option>
-                            <?php endforeach; ?>
+                        <label for="regional_id" class="block text-sm font-medium text-gray-700">Regional</label>
+                        <select name="regional_id" id="regional_id" 
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required
+                                onchange="cargarCentrosPorRegional(this.value)">
+                            <option value="">Seleccione una regional</option>
+                            <?php if(!empty($regionales)): ?>
+                                <?php foreach ($regionales as $regional): ?>
+                                    <option value="<?php echo htmlspecialchars($regional['id']); ?>">
+                                        <?php echo htmlspecialchars($regional['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No hay regionales disponibles</option>
+                            <?php endif; ?>
                         </select>
                     </div>
-                    <div class="flex justify-end">
-                        <button type="button" onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>
-                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Guardar</button>
+                    
+                    <!-- Contenedor de Centros (inicialmente oculto) -->
+                    <div id="centro-container" class="mb-4 hidden">
+                        <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro de formación</label>
+                        <select name="centro_id" id="centro_id" 
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                                required disabled>
+                            <option value="">Seleccione un centro</option>
+                        </select>
+                        <div id="centro-mensaje" class="mt-2 text-sm text-red-600 hidden"></div>
+                    </div>
+                    
+                    <!-- Botones del formulario -->
+                    <div class="flex justify-end space-x-2">
+                        <button type="button" onclick="closeModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="submit-btn"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50"
+                                disabled>
+                            Guardar Coordinador
+                        </button>
                     </div>
                 </form>
             </div>
@@ -94,14 +157,16 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($coordinadores as $coordinador): ?>
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-2"><?php echo $coordinador['nombre']; ?></h2>
-                    <p class="text-gray-600">Correo: <?php echo $coordinador['correo']; ?></p>
-                    <p class="text-gray-600">Centro: <?php echo $coordinador['centro_nombre']; ?></p>
+                    <h2 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($coordinador['nombre']); ?></h2>
+                    <p class="text-gray-600">Correo: <?php echo htmlspecialchars($coordinador['correo']); ?></p>
+                    <p class="text-gray-600">Centro: <?php echo htmlspecialchars($coordinador['centro_nombre']); ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <button onclick="window.location.href='editar_coordinador.php?id=<?php echo $coordinador['id']; ?>'" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
+                        <button onclick="window.location.href='editar_coordinador.php?id=<?php echo $coordinador['id']; ?>'" 
+                                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
                             <i class="fas fa-edit"></i> Editar
                         </button>
-                        <button onclick="if(confirm('¿Estás seguro de que deseas eliminar este coordinador?')) { window.location.href='../../controllers/SuperAdminController.php?action=delete_coordinador&id=<?php echo $coordinador['id']; ?>' }" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
+                        <button onclick="confirmarEliminacion(<?php echo $coordinador['id']; ?>)" 
+                                class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                             <i class="fas fa-trash"></i> Eliminar
                         </button>
                     </div>
@@ -111,17 +176,94 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
     </div>
 
     <script>
-        // Funciones para abrir y cerrar el modal
-        function openModal() {
-            document.getElementById('modal').classList.remove('hidden');
-        }
+    // Función para cargar centros según la regional seleccionada
+    function cargarCentrosPorRegional(regionalId) {
+        const centroContainer = document.getElementById('centro-container');
+        const centroSelect = document.getElementById('centro_id');
+        const centroMensaje = document.getElementById('centro-mensaje');
+        const submitBtn = document.getElementById('submit-btn');
 
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
+        // Resetear estado
+        centroMensaje.classList.add('hidden');
+        centroMensaje.textContent = '';
+        centroSelect.innerHTML = '<option value="">Cargando centros...</option>';
+        centroSelect.disabled = true;
+        submitBtn.disabled = true;
+        
+        // Ocultar si no hay regional seleccionada
+        if (!regionalId) {
+            centroContainer.classList.add('hidden');
+            return;
         }
+        
+        // Mostrar contenedor
+        centroContainer.classList.remove('hidden');
+        
+        // Realizar petición AJAX
+        fetch(`../../controllers/SuperAdminController.php?action=obtener_centros_por_regional&regional_id=${regionalId}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Error en la respuesta del servidor');
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.centros && data.centros.length > 0) {
+                    // Centros disponibles
+                    let options = '<option value="">Seleccione un centro</option>';
+                    data.centros.forEach(centro => {
+                        options += `<option value="${centro.id}">${centro.nombre}</option>`;
+                    });
+                    centroSelect.innerHTML = options;
+                    centroSelect.disabled = false;
+                    centroMensaje.classList.add('hidden');
+                    
+                    // Habilitar el botón de submit cuando se selecciona un centro
+                    centroSelect.addEventListener('change', function() {
+                        submitBtn.disabled = this.value === "";
+                    });
+                } else {
+                    // No hay centros
+                    centroSelect.innerHTML = '<option value="" disabled>No hay centros disponibles</option>';
+                    centroSelect.disabled = true;
+                    centroMensaje.textContent = 'Esta regional no tiene centros disponibles';
+                    centroMensaje.classList.remove('hidden');
+                    submitBtn.disabled = true;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                centroSelect.innerHTML = '<option value="" disabled>Error al cargar centros</option>';
+                centroSelect.disabled = true;
+                centroMensaje.textContent = 'Error al cargar los centros. Por favor intente nuevamente.';
+                centroMensaje.classList.remove('hidden');
+                submitBtn.disabled = true;
+            });
+    }
+
+    // Funciones para abrir/cerrar el modal
+    function openModal() {
+        document.getElementById('modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        // Resetear estado inicial
+        document.getElementById('centro-container').classList.add('hidden');
+        document.getElementById('submit-btn').disabled = true;
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('formCoordinador').reset();
+        document.getElementById('centro-container').classList.add('hidden');
+        document.getElementById('submit-btn').disabled = true;
+    }
+
+    // Función para confirmar eliminación
+    function confirmarEliminacion(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este coordinador?')) {
+            window.location.href = `../../controllers/SuperAdminController.php?action=delete_coordinador&id=${id}`;
+        }
+    }
     </script>
 
     <?php include '../partials/footer.php'; ?>
 </body>
-
 </html>
