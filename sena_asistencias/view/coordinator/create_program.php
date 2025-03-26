@@ -83,11 +83,16 @@ $centros = $centroModel->obtenerCentros();
                     <p class="text-gray-600">ID: <?php echo $programa['id']; ?></p>
                     <p class="text-gray-600">Centro: <?php echo $programa['centro_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <a href="edit_program.php?id=<?php echo $programa['id']; ?>" class="text-blue-500 hover:text-blue-700">
-                            <i class="fas fa-edit"></i> Editar
+                        <a href="edit_program.php?id=<?php echo $programa['id']; ?>" 
+                           class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out flex items-center space-x-2 shadow hover:shadow-md">
+                            <i class="fas fa-edit"></i>
+                            <span>Editar</span>
                         </a>
-                        <a href="../../controllers/CoordinatorController.php?action=delete_program&id=<?php echo $programa['id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('¿Estás seguro de que deseas eliminar este programa?');">
-                            <i class="fas fa-trash"></i> Eliminar
+                        <a href="../../controllers/CoordinatorController.php?action=delete_program&id=<?php echo $programa['id']; ?>" 
+                           class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition-all duration-200 ease-in-out flex items-center space-x-2 shadow hover:shadow-md"
+                           onclick="return confirm('¿Estás seguro de que deseas eliminar este programa?');">
+                            <i class="fas fa-trash"></i>
+                            <span>Eliminar</span>
                         </a>
                     </div>
                 </div>

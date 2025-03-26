@@ -18,6 +18,7 @@ $regionales = $regionalModel->obtenerRegionales();
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +26,7 @@ $regionales = $regionalModel->obtenerRegionales();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body class="bg-gray-100">
     <?php include '../partials/header.php'; ?>
     <?php include '../partials/sidebar.php'; ?>
@@ -35,12 +37,14 @@ $regionales = $regionalModel->obtenerRegionales();
         <!-- Mensajes de éxito o error -->
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                <?php echo $_SESSION['error'];
+                unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
         <?php if (isset($_SESSION['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <?php echo $_SESSION['success'];
+                unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
@@ -83,12 +87,12 @@ $regionales = $regionalModel->obtenerRegionales();
                     <p class="text-gray-600">ID: <?php echo $centro['id']; ?></p>
                     <p class="text-gray-600">Regional: <?php echo $centro['regional_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <a href="edit_center.php?id=<?php echo $centro['id']; ?>" class="text-blue-500 hover:text-blue-700">
+                        <button onclick="window.location.href='edit_center.php?id=<?php echo $centro['id']; ?>'" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
                             <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <a href="../../controllers/SuperAdminController.php?action=delete_center&id=<?php echo $centro['id']; ?>" class="text-red-500 hover:text-red-700" onclick="return confirm('¿Estás seguro de que deseas eliminar este centro?');">
+                        </button>
+                        <button onclick="if(confirm('¿Estás seguro de que deseas eliminar este centro?')) { window.location.href='../../controllers/SuperAdminController.php?action=delete_center&id=<?php echo $centro['id']; ?>' }" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                             <i class="fas fa-trash"></i> Eliminar
-                        </a>
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -107,4 +111,5 @@ $regionales = $regionalModel->obtenerRegionales();
 
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>

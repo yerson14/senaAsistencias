@@ -21,6 +21,7 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +29,7 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+
 <body class="bg-gray-100">
     <?php include '../partials/header.php'; ?>
     <?php include '../partials/sidebar.php'; ?>
@@ -38,12 +40,14 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
         <!-- Mensajes de éxito o error -->
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+                <?php echo $_SESSION['error'];
+                unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
         <?php if (isset($_SESSION['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                <?php echo $_SESSION['success'];
+                unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
@@ -94,12 +98,12 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
                     <p class="text-gray-600">Correo: <?php echo $coordinador['correo']; ?></p>
                     <p class="text-gray-600">Centro: <?php echo $coordinador['centro_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <a href="editar_coordinador.php?id=<?php echo $coordinador['id']; ?>" class="text-blue-500 hover:text-blue-700">
+                        <button onclick="window.location.href='editar_coordinador.php?id=<?php echo $coordinador['id']; ?>'" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
                             <i class="fas fa-edit"></i> Editar
-                        </a>
-                        <a href="../../controllers/SuperAdminController.php?action=delete_coordinador&id=<?php echo $coordinador['id']; ?>" class="text-red-500 hover:text-red-700">
+                        </button>
+                        <button onclick="if(confirm('¿Estás seguro de que deseas eliminar este coordinador?')) { window.location.href='../../controllers/SuperAdminController.php?action=delete_coordinador&id=<?php echo $coordinador['id']; ?>' }" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
                             <i class="fas fa-trash"></i> Eliminar
-                        </a>
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -119,4 +123,5 @@ $coordinadores = $coordinadorModel->obtenerCoordinadores();
 
     <?php include '../partials/footer.php'; ?>
 </body>
+
 </html>
