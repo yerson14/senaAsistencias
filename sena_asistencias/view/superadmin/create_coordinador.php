@@ -13,18 +13,17 @@ if ($_SESSION['usuario']['rol'] !== 'superadmin') {
 
 // Inicializar modelos
 $centroModel = new CentroModel();
-$coordinadorModel = new UsuarioModel();
+$usuarioModel = new UsuarioModel();
 $regionalModel = new RegionalModel();
 
 // Obtener datos necesarios
 $centros = $centroModel->obtenerCentros();
-$coordinadores = $coordinadorModel->obtenerCoordinadores();
+$coordinadores = $usuarioModel->obtenerCoordinadores();
 $regionales = $regionalModel->obtenerRegionales();
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,22 +31,11 @@ $regionales = $regionalModel->obtenerRegionales();
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .modal-container {
-            z-index: 1000;
-        }
-        .main-content {
-            min-height: calc(100vh - 120px);
-        }
-        select:disabled {
-            background-color: #f3f4f6;
-            cursor: not-allowed;
-        }
-        #centro-container {
-            transition: all 0.3s ease;
-        }
-        .hidden {
-            display: none !important;
-        }
+        .modal-container { z-index: 1000; }
+        .main-content { min-height: calc(100vh - 120px); }
+        select:disabled { background-color: #f3f4f6; cursor: not-allowed; }
+        #centro-container { transition: all 0.3s ease; }
+        .hidden { display: none !important; }
     </style>
 </head>
 
@@ -61,14 +49,12 @@ $regionales = $regionalModel->obtenerRegionales();
         <!-- Mensajes de éxito o error -->
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['error'];
-                unset($_SESSION['error']); ?>
+                <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
         <?php if (isset($_SESSION['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                <?php echo $_SESSION['success'];
-                unset($_SESSION['success']); ?>
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
@@ -82,56 +68,39 @@ $regionales = $regionalModel->obtenerRegionales();
             <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
                 <h2 class="text-xl font-bold mb-4">Agregar Coordinador</h2>
                 <form id="formCoordinador" action="../../controllers/SuperAdminController.php?action=crear_coordinador" method="POST">
-                    <!-- Campo Nombre -->
+                    <!-- Campos del formulario (nombre, correo, identificación) -->
                     <div class="mb-4">
                         <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
-                        <input type="text" name="nombre" id="nombre" 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                               required>
+                        <input type="text" name="nombre" id="nombre" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
                     
-                    <!-- Campo Correo -->
                     <div class="mb-4">
                         <label for="correo" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-                        <input type="email" name="correo" id="correo" 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                               required>
+                        <input type="email" name="correo" id="correo" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
                     
-                    <!-- Campo Identificación -->
                     <div class="mb-4">
                         <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de identificación</label>
-                        <input type="text" name="numero_identificacion" id="numero_identificacion" 
-                               class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                               required>
+                        <input type="text" name="numero_identificacion" id="numero_identificacion" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
                     </div>
                     
                     <!-- Selector de Regional -->
                     <div class="mb-4">
                         <label for="regional_id" class="block text-sm font-medium text-gray-700">Regional</label>
-                        <select name="regional_id" id="regional_id" 
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                required
-                                onchange="cargarCentrosPorRegional(this.value)">
+                        <select name="regional_id" id="regional_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required onchange="cargarCentrosPorRegional(this.value)">
                             <option value="">Seleccione una regional</option>
-                            <?php if(!empty($regionales)): ?>
-                                <?php foreach ($regionales as $regional): ?>
-                                    <option value="<?php echo htmlspecialchars($regional['id']); ?>">
-                                        <?php echo htmlspecialchars($regional['nombre']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <option value="" disabled>No hay regionales disponibles</option>
-                            <?php endif; ?>
+                            <?php foreach ($regionales as $regional): ?>
+                                <option value="<?= htmlspecialchars($regional['id']) ?>">
+                                    <?= htmlspecialchars($regional['nombre']) ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     
-                    <!-- Contenedor de Centros (inicialmente oculto) -->
+                    <!-- Contenedor de Centros -->
                     <div id="centro-container" class="mb-4 hidden">
                         <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro de formación</label>
-                        <select name="centro_id" id="centro_id" 
-                                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
-                                required disabled>
+                        <select name="centro_id" id="centro_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required disabled>
                             <option value="">Seleccione un centro</option>
                         </select>
                         <div id="centro-mensaje" class="mt-2 text-sm text-red-600 hidden"></div>
@@ -139,15 +108,8 @@ $regionales = $regionalModel->obtenerRegionales();
                     
                     <!-- Botones del formulario -->
                     <div class="flex justify-end space-x-2">
-                        <button type="button" onclick="closeModal()" 
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
-                            Cancelar
-                        </button>
-                        <button type="submit" id="submit-btn"
-                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50"
-                                disabled>
-                            Guardar Coordinador
-                        </button>
+                        <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">Cancelar</button>
+                        <button type="submit" id="submit-btn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition disabled:opacity-50" disabled>Guardar Coordinador</button>
                     </div>
                 </form>
             </div>
@@ -157,16 +119,15 @@ $regionales = $regionalModel->obtenerRegionales();
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($coordinadores as $coordinador): ?>
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($coordinador['nombre']); ?></h2>
-                    <p class="text-gray-600">Correo: <?php echo htmlspecialchars($coordinador['correo']); ?></p>
-                    <p class="text-gray-600">Centro: <?php echo htmlspecialchars($coordinador['centro_nombre']); ?></p>
+                    <h2 class="text-xl font-semibold mb-2"><?= htmlspecialchars($coordinador['nombre']) ?></h2>
+                    <p class="text-gray-600">Correo: <?= htmlspecialchars($coordinador['correo']) ?></p>
+                    <p class="text-gray-600">Regional: <?= htmlspecialchars($coordinador['regional_nombre']) ?></p>
+                    <p class="text-gray-600">Centro: <?= htmlspecialchars($coordinador['centro_nombre']) ?></p>
                     <div class="mt-4 flex space-x-2">
-                        <button onclick="window.location.href='editar_coordinador.php?id=<?php echo $coordinador['id']; ?>'" 
-                                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300">
+                        <a href="editar_coordinador.php?id=<?= $coordinador['id'] ?>" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
                             <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button onclick="confirmarEliminacion(<?php echo $coordinador['id']; ?>)" 
-                                class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">
+                        </a>
+                        <button onclick="confirmarEliminacion(<?= $coordinador['id'] ?>)" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">
                             <i class="fas fa-trash"></i> Eliminar
                         </button>
                     </div>
@@ -190,38 +151,31 @@ $regionales = $regionalModel->obtenerRegionales();
         centroSelect.disabled = true;
         submitBtn.disabled = true;
         
-        // Ocultar si no hay regional seleccionada
         if (!regionalId) {
             centroContainer.classList.add('hidden');
             return;
         }
         
-        // Mostrar contenedor
         centroContainer.classList.remove('hidden');
         
-        // Realizar petición AJAX
         fetch(`../../controllers/SuperAdminController.php?action=obtener_centros_por_regional&regional_id=${regionalId}`)
             .then(response => {
                 if (!response.ok) throw new Error('Error en la respuesta del servidor');
                 return response.json();
             })
             .then(data => {
-                if (data.success && data.centros && data.centros.length > 0) {
-                    // Centros disponibles
+                if (data.success && data.centros?.length > 0) {
                     let options = '<option value="">Seleccione un centro</option>';
                     data.centros.forEach(centro => {
                         options += `<option value="${centro.id}">${centro.nombre}</option>`;
                     });
                     centroSelect.innerHTML = options;
                     centroSelect.disabled = false;
-                    centroMensaje.classList.add('hidden');
                     
-                    // Habilitar el botón de submit cuando se selecciona un centro
                     centroSelect.addEventListener('change', function() {
                         submitBtn.disabled = this.value === "";
                     });
                 } else {
-                    // No hay centros
                     centroSelect.innerHTML = '<option value="" disabled>No hay centros disponibles</option>';
                     centroSelect.disabled = true;
                     centroMensaje.textContent = 'Esta regional no tiene centros disponibles';
@@ -239,11 +193,9 @@ $regionales = $regionalModel->obtenerRegionales();
             });
     }
 
-    // Funciones para abrir/cerrar el modal
     function openModal() {
         document.getElementById('modal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        // Resetear estado inicial
         document.getElementById('centro-container').classList.add('hidden');
         document.getElementById('submit-btn').disabled = true;
     }
@@ -256,7 +208,6 @@ $regionales = $regionalModel->obtenerRegionales();
         document.getElementById('submit-btn').disabled = true;
     }
 
-    // Función para confirmar eliminación
     function confirmarEliminacion(id) {
         if (confirm('¿Estás seguro de que deseas eliminar este coordinador?')) {
             window.location.href = `../../controllers/SuperAdminController.php?action=delete_coordinador&id=${id}`;

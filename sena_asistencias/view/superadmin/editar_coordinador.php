@@ -18,7 +18,7 @@ $regionalModel = new RegionalModel();
 // Obtener el ID del coordinador a editar
 $id = $_GET['id'];
 
-// Obtener la información del coordinador
+// Obtener la información completa del coordinador
 $coordinador = $usuarioModel->obtenerCoordinadorPorId($id);
 
 // Verificar si el coordinador existe
@@ -28,8 +28,9 @@ if (!$coordinador) {
     exit();
 }
 
-// Obtener datos necesarios
+// Obtener datos necesarios para el formulario
 $regionales = $regionalModel->obtenerRegionales();
+$centros = $centroModel->obtenerCentros();
 $centrosRegionalActual = $centroModel->obtenerCentrosPorRegional($coordinador['regional_id']);
 
 // Procesar el formulario de edición
@@ -38,21 +39,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $correo = $_POST['correo'];
     $numero_identificacion = $_POST['numero_identificacion'];
     $centro_id = $_POST['centro_id'];
+    $regional_id = $_POST['regional_id'];
 
-    // Validar que los campos no estén vacíos
-    if (empty($nombre) || empty($correo) || empty($numero_identificacion) || empty($centro_id)) {
-        $_SESSION['error'] = "Todos los campos son requeridos.";
-        header("Location: editar_coordinador.php?id=" . $id);
-        exit();
-    }
+    try {
+        // Validar que los campos no estén vacíos
+        if (empty($nombre) || empty($correo) || empty($numero_identificacion) || empty($centro_id) || empty($regional_id)) {
+            throw new Exception("Todos los campos son requeridos.");
+        }
 
-    // Actualizar el coordinador
-    if ($usuarioModel->editarCoordinador($id, $nombre, $correo, $numero_identificacion, $centro_id)) {
-        $_SESSION['success'] = "Coordinador actualizado exitosamente.";
-        header("Location: create_coordinador.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Error al actualizar el coordinador.";
+        // Actualizar el coordinador
+        if ($usuarioModel->editarCoordinador($id, $nombre, $correo, $numero_identificacion, $centro_id, $regional_id)) {
+            $_SESSION['success'] = "Coordinador actualizado exitosamente.";
+            header("Location: create_coordinador.php");
+            exit();
+        } else {
+            throw new Exception("Error al actualizar el coordinador.");
+        }
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
         header("Location: editar_coordinador.php?id=" . $id);
         exit();
     }
@@ -97,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <!-- Formulario para editar coordinador -->
         <form action="editar_coordinador.php?id=<?php echo $id; ?>" method="POST" class="max-w-lg">
+            <!-- Campo Nombre -->
             <div class="mb-4">
                 <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre</label>
                 <input type="text" name="nombre" id="nombre" 
@@ -105,6 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        required>
             </div>
             
+            <!-- Campo Correo -->
             <div class="mb-4">
                 <label for="correo" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
                 <input type="email" name="correo" id="correo" 
@@ -113,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                        required>
             </div>
             
+            <!-- Campo Identificación -->
             <div class="mb-4">
                 <label for="numero_identificacion" class="block text-sm font-medium text-gray-700">Número de Identificación</label>
                 <input type="text" name="numero_identificacion" id="numero_identificacion" 
@@ -138,9 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </select>
             </div>
             
-            <!-- Contenedor de Centros -->
+            <!-- Selector de Centros -->
             <div id="centro-container" class="mb-4">
-                <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro</label>
+                <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro de Formación</label>
                 <select name="centro_id" id="centro_id" 
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
                         required>
@@ -154,6 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="centro-mensaje" class="mt-2 text-sm text-red-600 hidden"></div>
             </div>
             
+            <!-- Botones del formulario -->
             <div class="flex space-x-2">
                 <a href="create_coordinador.php" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition">
                     Cancelar

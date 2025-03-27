@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/Database.php';
 
-
 class UsuarioModel {
     private $db;
 
@@ -21,56 +20,64 @@ class UsuarioModel {
         $stmt = $this->db->prepare("INSERT INTO usuarios (nombre, correo, numero_identificacion, rol) VALUES (?, ?, ?, ?)");
         return $stmt->execute([$nombre, $correo, $numero_identificacion, $rol]);
     }
-    // En UsuarioModel.php
 
-public function obtenerCoordinadores() {
-    try {
-        $stmt = $this->db->prepare("
-            SELECT u.id, u.nombre, u.correo, u.numero_identificacion, c.nombre AS centro_nombre
-            FROM usuarios u
-            LEFT JOIN coordinadores co ON u.id = co.usuario_id
-            LEFT JOIN centros c ON co.centro_id = c.id
-            WHERE u.rol = 'coordinador'
-        ");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        throw new Exception("Error de base de datos: " . $e->getMessage());
-    }
-}
-    // Editar un coordinador
-// En UsuarioModel.php
-
-public function editarCoordinador($id, $nombre, $correo, $numero_identificacion, $centro_id) {
-    try {
-        // Actualizar la información del coordinador en la tabla de usuarios
-        $stmt = $this->db->prepare("UPDATE usuarios SET nombre = ?, correo = ?, numero_identificacion = ? WHERE id = ?");
-        if ($stmt->execute([$nombre, $correo, $numero_identificacion, $id])) {
-            // Actualizar la asignación del coordinador al centro
-            $stmt = $this->db->prepare("UPDATE coordinadores SET centro_id = ? WHERE usuario_id = ?");
-            return $stmt->execute([$centro_id, $id]);
-        } else {
-            throw new Exception("Error al actualizar el coordinador.");
+    // Obtener todos los coordinadores con información de centro y regional
+    public function obtenerCoordinadores() {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    u.id, u.nombre, u.correo, u.numero_identificacion, 
+                    c.nombre AS centro_nombre, c.id AS centro_id,
+                    r.nombre AS regional_nombre, r.id AS regional_id
+                FROM usuarios u
+                JOIN coordinadores co ON u.id = co.usuario_id
+                JOIN centros c ON co.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE u.rol = 'coordinador'
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener coordinadores: " . $e->getMessage());
         }
-    } catch (PDOException $e) {
-        throw new Exception("Error de base de datos: " . $e->getMessage());
     }
-}
-public function obtenerCoordinadorPorId($id) {
-    try {
-        $stmt = $this->db->prepare("
-            SELECT u.*, c.centro_id, cen.nombre AS centro_nombre, cen.regional_id
-            FROM usuarios u
-            JOIN coordinadores co ON u.id = co.usuario_id
-            JOIN centros cen ON co.centro_id = cen.id
-            WHERE u.id = ? AND u.rol = 'coordinador'
-        ");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        error_log("Error en obtenerCoordinadorPorId: " . $e->getMessage());
-        return false;
+
+    // Editar un coordinador
+    public function editarCoordinador($id, $nombre, $correo, $numero_identificacion, $centro_id) {
+        try {
+            // Actualizar la información del coordinador en la tabla de usuarios
+            $stmt = $this->db->prepare("UPDATE usuarios SET nombre = ?, correo = ?, numero_identificacion = ? WHERE id = ?");
+            if ($stmt->execute([$nombre, $correo, $numero_identificacion, $id])) {
+                // Actualizar la asignación del coordinador al centro
+                $stmt = $this->db->prepare("UPDATE coordinadores SET centro_id = ? WHERE usuario_id = ?");
+                return $stmt->execute([$centro_id, $id]);
+            } else {
+                throw new Exception("Error al actualizar el coordinador.");
+            }
+        } catch (PDOException $e) {
+            throw new Exception("Error de base de datos: " . $e->getMessage());
+        }
     }
-}
+
+    // Obtener un coordinador por ID con información de centro y regional
+    public function obtenerCoordinadorPorId($id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    u.*, 
+                    c.id AS centro_id, c.nombre AS centro_nombre,
+                    r.id AS regional_id, r.nombre AS regional_nombre
+                FROM usuarios u
+                JOIN coordinadores co ON u.id = co.usuario_id
+                JOIN centros c ON co.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE u.id = ? AND u.rol = 'coordinador'
+            ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener coordinador: " . $e->getMessage());
+        }
+    }
 }
 ?>
