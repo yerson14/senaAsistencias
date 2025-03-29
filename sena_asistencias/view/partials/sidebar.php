@@ -20,7 +20,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <li class="p-4 hover:bg-green-500"><a href="../coordinator/create_ficha.php">Crear Ficha</a></li>
                 <li class="p-4 hover:bg-green-500"><a href="../coordinator/create_ambiente.php">Crear Ambiente</a></li>
                 <li class="p-4 hover:bg-green-500"><a href="../coordinator/create_instructor.php">Crear Instructor</a></li>
-                <!-- <li class="p-4 hover:bg-green-500"><a href="../coordinator/create_aprendices.php">Crear Aprendices</a></li> -->
+                <li class="p-4 hover:bg-green-500"><a href="../coordinator/create_aprendices.php">Crear Aprendices</a></li> 
             <?php elseif ($_SESSION['usuario']['rol'] === 'instructor'): ?>
                 <li class="p-4 hover:bg-green-500"><a href="../instructor/take_attendance.php">Tomar Lista</a></li>
                 <li class="p-4 hover:bg-green-500"><a href="../instructor/view_reports.php">Ver Reportes</a></li>

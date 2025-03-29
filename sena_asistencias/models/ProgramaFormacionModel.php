@@ -71,4 +71,36 @@ class ProgramaFormacionModel
             throw new Exception("Error al obtener el programa: " . $e->getMessage());
         }
     }
+    public function obtenerProgramasPorCoordinador($centro_id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT pf.*, c.nombre as centro_nombre, r.nombre as regional_nombre 
+                FROM programas_formacion pf 
+                JOIN centros c ON pf.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE pf.centro_id = ?
+                ORDER BY pf.nombre
+            ");
+            $stmt->execute([$centro_id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener los programas: " . $e->getMessage());
+        }
+    }
+    
+    public function obtenerProgramaPorIdConRegional($id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT pf.*, c.nombre as centro_nombre, r.id as regional_id, r.nombre as regional_nombre 
+                FROM programas_formacion pf 
+                JOIN centros c ON pf.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE pf.id = ?
+            ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener el programa: " . $e->getMessage());
+        }
+    }
 }

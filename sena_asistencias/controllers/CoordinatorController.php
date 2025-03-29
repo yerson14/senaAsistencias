@@ -363,28 +363,24 @@ public function updateProgram($id, $nombre, $centro_id)
     }
 }
     // Método para crear un aprendiz
-    public function crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id) {
-        try {
-            if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id) || empty($centro_id)) {
-                throw new Exception("Todos los campos son requeridos.");
-            }
-
-            $aprendizModel = new AprendizModel($this->db);
-            if ($aprendizModel->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id)) {
-                $_SESSION['success'] = "Aprendiz creado exitosamente.";
-            } else {
-                throw new Exception("Error al crear el aprendiz.");
-            }
-        } catch (PDOException $e) {
-            $_SESSION['error'] = "Error de base de datos: " . $e->getMessage();
-        } catch (Exception $e) {
-            $_SESSION['error'] = $e->getMessage();
+    public function crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id) {
+    try {
+        if (empty($nombre) || empty($numero_identificacion) || empty($ficha_id) || empty($centro_id) || empty($regional_id)) {
+            throw new Exception("Todos los campos son requeridos.");
         }
 
-        header("Location: /senaAsistencias/sena_asistencias/view/coordinator/create_aprendices.php");
-        exit();
+        $aprendizModel = new AprendizModel($this->db);
+        if ($aprendizModel->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id)) {
+            $_SESSION['success'] = "Aprendiz creado exitosamente.";
+        } else {
+            throw new Exception("Error al crear el aprendiz.");
+        }
+    } catch (Exception $e) {
+        $_SESSION['error'] = $e->getMessage();
     }
-
+    header("Location: ../view/coordinator/create_aprendices.php");
+    exit();
+}
     // Método para actualizar un aprendiz
     public function actualizarAprendiz($id, $nombre, $numero_identificacion, $ficha_id, $centro_id) {
         try {
@@ -408,6 +404,15 @@ public function updateProgram($id, $nombre, $centro_id)
         exit();
     }
 
+    public function obtenerProgramasCoordinador($centro_id) {
+        try {
+            $programaModel = new ProgramaFormacionModel($this->db);
+            return $programaModel->obtenerProgramasPorCoordinador($centro_id);
+        } catch (Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            return [];
+        }
+    }
     // Método para eliminar un aprendiz
     public function eliminarAprendiz($id) {
         try {
