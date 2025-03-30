@@ -87,7 +87,7 @@ $centros = $centroModel->obtenerCentros();
         <!-- Lista de ambientes -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($ambientes as $ambiente): ?>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="border-2 border-green-500 bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-2"><?php echo $ambiente['nombre']; ?></h2>
                     <p class="text-gray-600">ID: <?php echo $ambiente['id']; ?></p>
                     <p class="text-gray-600">Centro: <?php echo $ambiente['centro_nombre'] ?? 'Sin centro'; ?></p>

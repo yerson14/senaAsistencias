@@ -302,6 +302,19 @@ public function eliminarInstructor($id) {
         $centroModel = new CentroModel($this->db);
         return $centroModel->obtenerCentros();
     }
+    public function obtenerCentrosPorRegional($regional_id) {
+        try {
+            $centroModel = new CentroModel($this->db);
+            $centros = $centroModel->obtenerCentrosPorRegional($regional_id);
+            header('Content-Type: application/json');
+            echo json_encode($centros);
+            exit();
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            echo json_encode(['error' => $e->getMessage()]);
+            exit();
+        }
+    }
     // Método para eliminar un programa
 public function deleteProgram($id)
 {
@@ -432,7 +445,6 @@ public function updateProgram($id, $nombre, $centro_id)
         exit();
     }
 
-
 // Eliminar un aprendiz
 
 }
@@ -540,15 +552,16 @@ if (isset($_GET['action'])) {
         $coordinadorController->eliminarInstructor($id);
     }
         // Acción para crear un aprendiz
-        if ($action === 'create_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nombre = $_POST['nombre'];
-            $numero_identificacion = $_POST['numero_identificacion'];
-            $ficha_id = $_POST['ficha_id'];
-            $centro_id = $_POST['centro_id']; // Obtener el centro_id del formulario
+        // En la parte de manejo de acciones (al final del archivo):
+if ($action === 'create_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $nombre = $_POST['nombre'];
+    $numero_identificacion = $_POST['numero_identificacion'];
+    $ficha_id = $_POST['ficha_id'];
+    $centro_id = $_POST['centro_id'];
+    $regional_id = $_POST['regional_id']; // Añadir esta línea
     
-            // Crear el aprendiz
-            $coordinadorController->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id);
-        }
+    $coordinadorController->crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id);
+}
     
         // Acción para actualizar un aprendiz
         if ($action === 'update_aprendiz' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -567,4 +580,9 @@ if (isset($_GET['action'])) {
             $id = $_GET['id'];
             $coordinadorController->eliminarAprendiz($id);
         }
+        // Y en el manejo de acciones al final del archivo, añade:
+if ($action === 'get_centros' && isset($_GET['regional_id'])) {
+    $regional_id = $_GET['regional_id'];
+    $coordinadorController->obtenerCentrosPorRegional($regional_id);
+}
 }

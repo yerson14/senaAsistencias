@@ -86,7 +86,7 @@ $fichas = $fichaModel->obtenerFichas();
         <!-- Lista de fichas -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($fichas as $ficha): ?>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="border-2 border-green-500 bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-2">Ficha #<?php echo $ficha['codigo']; ?></h2>
                     <p class="text-gray-600">Programa: <?php echo $ficha['programa_nombre']; ?></p>
                     <div class="mt-4 flex space-x-2">

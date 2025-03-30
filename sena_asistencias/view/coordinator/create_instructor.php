@@ -91,7 +91,7 @@ $centros = $centroModel->obtenerCentros();
         <!-- Lista de instructores -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($instructores as $instructor): ?>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="border-2 border-green-500 bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-2"><?php echo $instructor['nombre']; ?></h2>
                     <p class="text-gray-600">Correo: <?php echo $instructor['correo']; ?></p>
                     <p class="text-gray-600">Número de Identificación: <?php echo $instructor['numero_identificacion']; ?></p>

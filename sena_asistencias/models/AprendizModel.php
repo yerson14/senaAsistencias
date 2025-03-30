@@ -10,10 +10,30 @@ class AprendizModel {
 
     public function crearAprendiz($nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id) {
         try {
-            $stmt = $this->db->prepare("INSERT INTO aprendices (nombre, numero_identificacion, ficha_id, centro_id, regional_id) VALUES (?, ?, ?, ?, ?)");
-            return $stmt->execute([$nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id]);
+            // Primero obtener el programa_formacion_id de la ficha
+            $stmt = $this->db->prepare("SELECT programa_formacion_id FROM fichas WHERE id = ?");
+            $stmt->execute([$ficha_id]);
+            $ficha = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$ficha) {
+                throw new Exception("La ficha especificada no existe.");
+            }
+    
+            $programa_formacion_id = $ficha['programa_formacion_id'];
+    
+            $stmt = $this->db->prepare(
+                "INSERT INTO aprendices 
+                (nombre, numero_identificacion, ficha_id, centro_id, regional_id, programa_formacion_id) 
+                VALUES (?, ?, ?, ?, ?, ?)"
+            );
+    
+            if ($stmt->execute([$nombre, $numero_identificacion, $ficha_id, $centro_id, $regional_id, $programa_formacion_id])) {
+                return true;
+            } else {
+                throw new Exception("Error al crear el aprendiz.");
+            }
         } catch (PDOException $e) {
-            throw new Exception("Error al crear aprendiz: " . $e->getMessage());
+            throw new Exception("Error de base de datos: " . $e->getMessage());
         }
     }
 

@@ -78,7 +78,7 @@ $centros = $centroModel->obtenerCentros();
         <!-- Lista de programas -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <?php foreach ($programas as $programa): ?>
-                <div class="bg-white p-6 rounded-lg shadow-md">
+                <div class="border-2 border-green-500 bg-white p-6 rounded-lg shadow-md">
                     <h2 class="text-xl font-semibold mb-2"><?php echo $programa['nombre']; ?></h2>
                     <p class="text-gray-600">ID: <?php echo $programa['id']; ?></p>
                     <p class="text-gray-600">Centro: <?php echo $programa['centro_nombre']; ?></p>
