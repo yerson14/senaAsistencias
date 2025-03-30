@@ -9,16 +9,15 @@ require_once '../../config/Database.php';
 require_once '../../models/ProgramaFormacionModel.php';
 require_once '../../models/FichaModel.php';
 
-// Obtener el ID de la ficha desde la URL
 $id = $_GET['id'];
 
-// Obtener los programas de formación desde la base de datos
+// Obtener programas con información de centro y regional
 $programaFormacionModel = new ProgramaFormacionModel(Database::getInstance()->getConnection());
-$programas = $programaFormacionModel->obtenerProgramas();
+$programas = $programaFormacionModel->obtenerProgramasConRegionalYCentro();
 
-// Obtener la ficha por su ID
+// Obtener la ficha con información completa
 $fichaModel = new FichaModel(Database::getInstance()->getConnection());
-$ficha = $fichaModel->obtenerFichaPorId($id);
+$ficha = $fichaModel->obtenerFichaCompleta($id);
 
 if (!$ficha) {
     $_SESSION['error'] = "La ficha no existe.";
@@ -43,21 +42,18 @@ if (!$ficha) {
     <div class="ml-64 p-8">
         <h1 class="text-3xl font-bold mb-6">Editar Ficha</h1>
 
-        <!-- Mostrar mensajes de error -->
         <?php if (isset($_SESSION['error'])): ?>
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                 <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Mostrar mensajes de éxito -->
         <?php if (isset($_SESSION['success'])): ?>
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                 <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Formulario para editar ficha -->
         <form action="../../controllers/CoordinatorController.php?action=edit_ficha&id=<?php echo $id; ?>" method="POST">
             <div class="mb-4">
                 <label for="numero" class="block text-sm font-medium text-gray-700">Número de Ficha</label>
@@ -69,10 +65,14 @@ if (!$ficha) {
                     <option value="">Seleccione un Programa</option>
                     <?php foreach ($programas as $programa): ?>
                         <option value="<?php echo $programa['id']; ?>" <?php echo ($programa['id'] == $ficha['programa_formacion_id']) ? 'selected' : ''; ?>>
-                            <?php echo $programa['nombre']; ?>
+                            <?php echo $programa['nombre']; ?> (<?php echo $programa['centro_nombre']; ?> - <?php echo $programa['regional_nombre']; ?>)
                         </option>
                     <?php endforeach; ?>
                 </select>
+            </div>
+            <div class="mb-4 bg-gray-100 p-3 rounded-md">
+                <p class="text-sm"><strong>Regional actual:</strong> <?php echo $ficha['regional_nombre']; ?></p>
+                <p class="text-sm"><strong>Centro actual:</strong> <?php echo $ficha['centro_nombre']; ?></p>
             </div>
             <div class="flex justify-end">
                 <button type="button" onclick="window.history.back()" class="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-600">Cancelar</button>

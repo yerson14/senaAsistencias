@@ -8,6 +8,39 @@ class AmbienteModel {
         $this->db = Database::getInstance()->getConnection();
     }
 
+
+    public function obtenerAmbientesCompletos() {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT a.*, c.nombre as centro_nombre, r.nombre as regional_nombre 
+                FROM ambientes a 
+                JOIN centros c ON a.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                ORDER BY a.nombre
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener ambientes completos: " . $e->getMessage());
+        }
+    }
+
+    // Obtener un ambiente con información completa
+    public function obtenerAmbienteCompleto($id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT a.*, c.nombre as centro_nombre, r.nombre as regional_nombre, r.id as regional_id 
+                FROM ambientes a 
+                JOIN centros c ON a.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE a.id = ?
+            ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener ambiente completo: " . $e->getMessage());
+        }
+    }
     // Crear un nuevo ambiente
     public function crearAmbiente($nombre, $centro_id) {
         try {

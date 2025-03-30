@@ -60,24 +60,20 @@ class CentroModel {
     }
 
     // Obtener todos los centros
-    public function obtenerCentros() {
-        try {
-            // Preparar la consulta SQL
-            $stmt = $this->db->query("SELECT c.id, c.nombre, r.nombre as regional_nombre 
-                                     FROM centros c 
-                                     JOIN regionales r ON c.regional_id = r.id");
-
-            // Verificar si se obtuvieron resultados
-            if ($stmt) {
-                return $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                throw new Exception("Error al obtener los centros.");
-            }
-        } catch (PDOException $e) {
-            // Capturar errores de la base de datos
-            throw new Exception("Error de base de datos: " . $e->getMessage());
-        }
+    public function obtenerCentros()
+{
+    try {
+        $stmt = $this->db->query("
+            SELECT c.id, c.nombre, r.nombre as regional_nombre, r.id as regional_id 
+            FROM centros c 
+            JOIN regionales r ON c.regional_id = r.id
+            ORDER BY r.nombre, c.nombre
+        ");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        throw new Exception("Error al obtener los centros: " . $e->getMessage());
     }
+}
     public function editarCentro($id, $nombre, $regional_id) {
         try {
             // Validar que los campos no estén vacíos
@@ -142,4 +138,19 @@ class CentroModel {
             return false;
         }
     }
+    // Agregar este método a la clase CentroModel
+public function obtenerCentrosConRegional() {
+    try {
+        $stmt = $this->db->prepare("
+            SELECT c.*, r.nombre as regional_nombre 
+            FROM centros c 
+            JOIN regionales r ON c.regional_id = r.id
+            ORDER BY r.nombre, c.nombre
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        throw new Exception("Error al obtener centros con regional: " . $e->getMessage());
+    }
+}
 }

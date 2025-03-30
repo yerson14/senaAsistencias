@@ -8,13 +8,16 @@ if ($_SESSION['usuario']['rol'] !== 'coordinador') {
 require_once '../../config/Database.php';
 require_once '../../models/ProgramaFormacionModel.php';
 require_once '../../models/CentroModel.php';
+require_once '../../models/RegionalModel.php';
 
 $programaModel = new ProgramaFormacionModel(Database::getInstance()->getConnection());
 $centroModel = new CentroModel(Database::getInstance()->getConnection());
+$regionalModel = new RegionalModel();
 
 $id = $_GET['id'];
 $programa = $programaModel->obtenerProgramaPorIdConRegional($id);
-$centro = $centroModel->obtenerCentroPorId($programa['centro_id']);
+$centros = $centroModel->obtenerCentros();
+$regionales = $regionalModel->obtenerRegionales();
 ?>
 
 <!DOCTYPE html>
@@ -25,6 +28,7 @@ $centro = $centroModel->obtenerCentroPorId($programa['centro_id']);
     <title>Editar Programa</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-100 flex flex-col min-h-screen">
     <?php include '../partials/header.php'; ?>
@@ -55,18 +59,30 @@ $centro = $centroModel->obtenerCentroPorId($programa['centro_id']);
             </div>
             
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Regional</label>
-                <div class="mt-1 p-2 bg-gray-100 rounded-md">
-                    <?= htmlspecialchars($programa['regional_nombre']) ?>
-                </div>
+                <label for="regional_id" class="block text-sm font-medium text-gray-700">Regional</label>
+                <select name="regional_id" id="regional_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required onchange="cargarCentros(this.value, <?= $programa['centro_id'] ?>)">
+                    <option value="">Seleccione una regional</option>
+                    <?php foreach ($regionales as $regional): ?>
+                        <option value="<?= $regional['id'] ?>" <?= $regional['id'] == $programa['regional_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($regional['nombre']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Centro</label>
-                <div class="mt-1 p-2 bg-gray-100 rounded-md">
-                    <?= htmlspecialchars($programa['centro_nombre']) ?>
-                </div>
-                <input type="hidden" name="centro_id" value="<?= $programa['centro_id'] ?>">
+                <label for="centro_id" class="block text-sm font-medium text-gray-700">Centro</label>
+                <select name="centro_id" id="centro_id" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    <option value="">Seleccione un centro</option>
+                    <?php 
+                    // Mostrar solo los centros de la regional actual
+                    $centrosRegional = $centroModel->obtenerCentrosPorRegional($programa['regional_id']);
+                    foreach ($centrosRegional as $centro): ?>
+                        <option value="<?= $centro['id'] ?>" <?= $centro['id'] == $programa['centro_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($centro['nombre']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             
             <div class="flex justify-end">
@@ -79,6 +95,33 @@ $centro = $centroModel->obtenerCentroPorId($programa['centro_id']);
             </div>
         </form>
     </div>
+
+    <script>
+        function cargarCentros(regional_id, centroSeleccionado = null) {
+            if (regional_id) {
+                $.ajax({
+                    url: '../../controllers/CoordinatorController.php?action=get_centros&regional_id=' + regional_id,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        var select = $('#centro_id');
+                        select.empty();
+                        select.append('<option value="">Seleccione un centro</option>');
+                        
+                        $.each(data, function(index, centro) {
+                            var selected = (centroSeleccionado && centro.id == centroSeleccionado) ? 'selected' : '';
+                            select.append('<option value="' + centro.id + '" ' + selected + '>' + centro.nombre + '</option>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error al cargar centros:', error);
+                    }
+                });
+            } else {
+                $('#centro_id').empty().append('<option value="">Seleccione un centro</option>');
+            }
+        }
+    </script>
 
     <?php include '../partials/footer.php'; ?>
 </body>

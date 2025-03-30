@@ -12,15 +12,21 @@ class ProgramaFormacionModel
 
     // Método para obtener todos los programas de formación
     public function obtenerProgramas()
-    {
-        try {
-            $stmt = $this->db->prepare("SELECT pf.*, c.nombre as centro_nombre FROM programas_formacion pf JOIN centros c ON pf.centro_id = c.id");
-            $stmt->execute();
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            throw new Exception("Error al obtener los programas de formación: " . $e->getMessage());
-        }
+{
+    try {
+        $stmt = $this->db->prepare("
+            SELECT pf.*, c.nombre as centro_nombre, r.nombre as regional_nombre 
+            FROM programas_formacion pf 
+            JOIN centros c ON pf.centro_id = c.id
+            JOIN regionales r ON c.regional_id = r.id
+            ORDER BY pf.nombre
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        throw new Exception("Error al obtener los programas de formación: " . $e->getMessage());
     }
+}
 
     // Método para crear un nuevo programa de formación
     public function crearPrograma($nombre, $centro_id)
@@ -103,4 +109,20 @@ class ProgramaFormacionModel
             throw new Exception("Error al obtener el programa: " . $e->getMessage());
         }
     }
+    // Agregar este método a la clase ProgramaFormacionModel
+public function obtenerProgramasConRegionalYCentro() {
+    try {
+        $stmt = $this->db->prepare("
+            SELECT p.*, c.nombre as centro_nombre, r.nombre as regional_nombre 
+            FROM programas_formacion p 
+            JOIN centros c ON p.centro_id = c.id
+            JOIN regionales r ON c.regional_id = r.id
+            ORDER BY p.nombre
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        throw new Exception("Error al obtener programas con regional y centro: " . $e->getMessage());
+    }
+}
 }

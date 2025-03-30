@@ -82,4 +82,41 @@ class FichaModel
             throw new Exception("Error al eliminar la ficha: " . $e->getMessage());
         }
     }
+     // Obtener fichas con información completa (programa, centro y regional)
+     public function obtenerFichasCompletas() {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT f.*, p.nombre as programa_nombre, 
+                       c.nombre as centro_nombre, r.nombre as regional_nombre 
+                FROM fichas f 
+                JOIN programas_formacion p ON f.programa_formacion_id = p.id
+                JOIN centros c ON p.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                ORDER BY f.codigo
+            ");
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener las fichas completas: " . $e->getMessage());
+        }
+    }
+
+    // Obtener una ficha con información completa
+    public function obtenerFichaCompleta($id) {
+        try {
+            $stmt = $this->db->prepare("
+                SELECT f.*, p.nombre as programa_nombre, 
+                       c.nombre as centro_nombre, r.nombre as regional_nombre 
+                FROM fichas f 
+                JOIN programas_formacion p ON f.programa_formacion_id = p.id
+                JOIN centros c ON p.centro_id = c.id
+                JOIN regionales r ON c.regional_id = r.id
+                WHERE f.id = ?
+            ");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error al obtener la ficha completa: " . $e->getMessage());
+        }
+    }
 }
