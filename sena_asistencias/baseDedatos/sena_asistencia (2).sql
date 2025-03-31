@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 17-03-2025 a las 05:35:42
+-- Tiempo de generación: 31-03-2025 a las 19:25:28
 -- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Versión de PHP: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -40,12 +40,9 @@ CREATE TABLE `ambientes` (
 INSERT INTO `ambientes` (`id`, `nombre`, `centro_id`) VALUES
 (1, 'Sistemas 2', 1),
 (2, 'Sistemas 1', 1),
-(4, 'juan', 1),
-(5, 'kjkjl', 1),
-(7, 'adso', 1),
-(8, 'Regional de Caldas', 1),
-(9, 'assa', 1),
-(10, 'Apoyo 2', 1);
+(10, 'Apoyo 2', 1),
+(12, 'Sistemas 3', 1),
+(13, 'virtual 1', 3);
 
 -- --------------------------------------------------------
 
@@ -80,12 +77,23 @@ INSERT INTO `aprendices` (`id`, `nombre`, `numero_identificacion`, `ficha_id`, `
 
 CREATE TABLE `asistencias` (
   `id` int(11) NOT NULL,
+  `aprendiz_id` int(11) NOT NULL,
+  `programa_id` int(11) NOT NULL,
   `ficha_id` int(11) NOT NULL,
   `ambiente_id` int(11) NOT NULL,
-  `instructor_id` int(11) NOT NULL,
   `fecha` date NOT NULL,
-  `estado` enum('presente','ausente') NOT NULL
+  `hora_inicio` time NOT NULL,
+  `hora_fin` time NOT NULL,
+  `estado` enum('presente','ausente','excusa') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `asistencias`
+--
+
+INSERT INTO `asistencias` (`id`, `aprendiz_id`, `programa_id`, `ficha_id`, `ambiente_id`, `fecha`, `hora_inicio`, `hora_fin`, `estado`) VALUES
+(28, 1, 4, 1, 10, '2025-03-31', '07:00:00', '12:00:00', 'presente'),
+(29, 2, 4, 1, 10, '2025-03-31', '07:00:00', '12:00:00', 'excusa');
 
 -- --------------------------------------------------------
 
@@ -104,7 +112,10 @@ CREATE TABLE `centros` (
 --
 
 INSERT INTO `centros` (`id`, `nombre`, `regional_id`) VALUES
-(1, 'CPIC', 1);
+(1, 'CPIC', 1),
+(3, 'Minero Ambiental', 4),
+(4, 'Automatizacion Industrial', 6),
+(5, 'Automatizacion Industrial', 1);
 
 -- --------------------------------------------------------
 
@@ -123,7 +134,9 @@ CREATE TABLE `coordinadores` (
 --
 
 INSERT INTO `coordinadores` (`id`, `usuario_id`, `centro_id`) VALUES
-(1, 4, 1);
+(1, 4, 1),
+(2, 6, 3),
+(3, 7, 4);
 
 -- --------------------------------------------------------
 
@@ -142,8 +155,9 @@ CREATE TABLE `fichas` (
 --
 
 INSERT INTO `fichas` (`id`, `codigo`, `programa_formacion_id`) VALUES
-(1, 'Ficha123', 1),
-(2, 'Ficha456', 2);
+(1, '2873711', 1),
+(2, '2874614', 2),
+(4, '2847431', 5);
 
 -- --------------------------------------------------------
 
@@ -162,7 +176,8 @@ CREATE TABLE `instructores` (
 --
 
 INSERT INTO `instructores` (`id`, `usuario_id`, `centro_id`) VALUES
-(1, 5, 1);
+(1, 5, 1),
+(2, 9, 3);
 
 -- --------------------------------------------------------
 
@@ -182,7 +197,9 @@ CREATE TABLE `programas_formacion` (
 
 INSERT INTO `programas_formacion` (`id`, `nombre`, `centro_id`) VALUES
 (1, 'Programa de Sistemas', 1),
-(2, 'Programa de Electrónica', 1);
+(2, 'Programa de Electrónica', 1),
+(4, 'ADSO', 1),
+(5, 'Mantenimiento de equipos de computo', 4);
 
 -- --------------------------------------------------------
 
@@ -200,8 +217,9 @@ CREATE TABLE `regionales` (
 --
 
 INSERT INTO `regionales` (`id`, `nombre`) VALUES
-(1, 'Regional de Caldass'),
-(4, 'Regional Distrito Capital');
+(1, 'Regional Caldas'),
+(4, 'Regional El Bagre'),
+(6, 'Dosquebradas');
 
 -- --------------------------------------------------------
 
@@ -223,9 +241,11 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id`, `nombre`, `correo`, `numero_identificacion`, `rol`) VALUES
 (1, 'Super Admin', 'superadmin@sena.edu.co', '123456789', 'superadmin'),
-(3, 'juan', 'juan@hotmail.com', '123456', 'coordinador'),
-(4, 'juan pepep', 'pepe@hotmail.com', '12345671', 'coordinador'),
-(5, 'carlitos', 'carlos@gmail.com', '123', 'instructor');
+(4, 'Juan Pepe', 'pepe@hotmail.com', '12345671', 'coordinador'),
+(5, 'carlitos', 'carlos@gmail.com', '123', 'instructor'),
+(6, 'German ', 'germancito@gmail.com', '1213141516', 'coordinador'),
+(7, 'Jose', 'Jose@gmail.com', '12345', 'coordinador'),
+(9, 'Jose', 'j@gmail.com', '1456', 'instructor');
 
 --
 -- Índices para tablas volcadas
@@ -254,9 +274,10 @@ ALTER TABLE `aprendices`
 --
 ALTER TABLE `asistencias`
   ADD PRIMARY KEY (`id`),
+  ADD KEY `aprendiz_id` (`aprendiz_id`),
+  ADD KEY `programa_id` (`programa_id`),
   ADD KEY `ficha_id` (`ficha_id`),
-  ADD KEY `ambiente_id` (`ambiente_id`),
-  ADD KEY `instructor_id` (`instructor_id`);
+  ADD KEY `ambiente_id` (`ambiente_id`);
 
 --
 -- Indices de la tabla `centros`
@@ -317,7 +338,7 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `ambientes`
 --
 ALTER TABLE `ambientes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `aprendices`
@@ -329,49 +350,49 @@ ALTER TABLE `aprendices`
 -- AUTO_INCREMENT de la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT de la tabla `centros`
 --
 ALTER TABLE `centros`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `coordinadores`
 --
 ALTER TABLE `coordinadores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `fichas`
 --
 ALTER TABLE `fichas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `instructores`
 --
 ALTER TABLE `instructores`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `programas_formacion`
 --
 ALTER TABLE `programas_formacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `regionales`
 --
 ALTER TABLE `regionales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Restricciones para tablas volcadas
@@ -396,9 +417,10 @@ ALTER TABLE `aprendices`
 -- Filtros para la tabla `asistencias`
 --
 ALTER TABLE `asistencias`
-  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`ficha_id`) REFERENCES `fichas` (`id`),
-  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`),
-  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`instructor_id`) REFERENCES `instructores` (`id`);
+  ADD CONSTRAINT `asistencias_ibfk_1` FOREIGN KEY (`aprendiz_id`) REFERENCES `aprendices` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_2` FOREIGN KEY (`programa_id`) REFERENCES `programas_formacion` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_3` FOREIGN KEY (`ficha_id`) REFERENCES `fichas` (`id`),
+  ADD CONSTRAINT `asistencias_ibfk_4` FOREIGN KEY (`ambiente_id`) REFERENCES `ambientes` (`id`);
 
 --
 -- Filtros para la tabla `centros`
